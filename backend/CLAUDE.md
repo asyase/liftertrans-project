@@ -25,18 +25,24 @@ See fail annab juhiseid Claude Code'ile (claude.ai/code) selles repositooriumis 
 
 ## Andmebaasi seadistamine
 
-PostgreSQL peab töötama `localhost`-is järgmiste seadetega:
+PostgreSQL peab töötama `localhost`-is järgmiste vaikeseadetega (kõik ülekirjutatavad keskkonnamuutujatega `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` — vt `application.properties`):
 - Andmebaas: `vali_it`
+- Port: `5432`
 - Kasutajanimi: `postgres`
 - Parool: `student123`
 - Mugav DB url: `jdbc:postgresql://localhost:5432/vali_it`
 
-Käivita skriptid järjekorras kaustast `docs/database`:
-1. `1_reset_database.sql` — kustutab ja loob uuesti `minu_projekt` skeema
+Kui lokaalne PostgreSQL kuulab teisel pordil, käivita backend nt:
+```bash
+DB_PORT=5433 ./gradlew bootRun
+```
+
+Käivita skriptid järjekorras kaustast `docs/database`, **ühe ja sama psql seansi sees** (nt `psql -f 1_reset_database.sql -f 2_create.sql -f 3_import.sql`), kuna `2_create.sql` ei sea `search_path` uuesti — eraldi seanssidena käivitades tekivad tabelid vale skeemasse (`public`):
+1. `1_reset_database.sql` — kustutab ja loob uuesti `liftertrans_project` skeema
 2. `2_create.sql` — loob kõik tabelid
 3. `3_import.sql` — lisab algandmed
 
-Kõik tabelid asuvad `minu_projekt` skeemas.
+Kõik tabelid asuvad `liftertrans_project` skeemas.
 
 ## Arhitektuur
 
