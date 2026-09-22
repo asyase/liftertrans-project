@@ -57,7 +57,7 @@ backend/
 | Kaust/fail | Eesmärk |
 |------------|---------|
 | `CLAUDE.md` | Backendi juhised Claude Code'ile — Spring Boot, Java konventsioonid |
-| `build.gradle` / `settings.gradle` | Gradle build ja sõltuvuste haldus |
+| `build.gradle` / `../../backend/settings.gradle` | Gradle build ja sõltuvuste haldus |
 | `gradle/`, `gradlew` | Gradle wrapper — projekti käivitamiseks ilma eraldi Gradle'i paigalduseta |
 | `src/main/java/.../MinuprojektApplication.java` | Spring Boot rakenduse käivitusklass |
 | `src/main/java/.../Error.java`, `Status.java` | Üldised enum-tüübid, mida kasutatakse läbi rakenduse |
