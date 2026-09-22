@@ -1,7 +1,7 @@
 package ee.liftertrans.mapper;
 import org.mapstruct.Mapping;
 import ee.liftertrans.dto.JobListDto;
-import ee.liftertrans.entity.Job;
+import ee.liftertrans.persistence.entity.Job;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;

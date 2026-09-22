@@ -2,9 +2,9 @@ package ee.liftertrans.service;
 
 
 import ee.liftertrans.dto.JobListDto;
-import ee.liftertrans.entity.Job;
+import ee.liftertrans.persistence.entity.Job;
 import ee.liftertrans.mapper.JobMapper;
-import ee.liftertrans.repository.JobRepository;
+import ee.liftertrans.persistence.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

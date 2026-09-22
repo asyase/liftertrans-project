@@ -25,6 +25,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 
+    public ResponseEntity<ApiError> handleUnauthorizedException(
+            UnauthorizedException exception
+    ) {
+        ApiError apiError = new ApiError();
+        apiError.setMessage(exception.getMessage());
+        apiError.setErrorCode(exception.getErrorCode());
+
+        return new ResponseEntity<>(
+                apiError,
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+
+
     @ExceptionHandler
     public ResponseEntity<ApiError> handleDataNotFoundException(DataNotFoundException exception) {
         ApiError apiError = new ApiError();

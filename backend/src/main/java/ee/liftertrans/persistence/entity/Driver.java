@@ -1,4 +1,4 @@
-package ee.liftertrans.entity;
+package ee.liftertrans.persistence.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
