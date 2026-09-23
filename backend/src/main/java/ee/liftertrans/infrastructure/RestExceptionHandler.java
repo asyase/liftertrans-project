@@ -41,6 +41,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setErrorCode(exception.getErrorCode());
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleUnauthorizedException(UnauthorizedException exception) {
+        ApiError apiError = new ApiError();
+        apiError.setMessage(exception.getMessage());
+        apiError.setErrorCode(exception.getErrorCode());
+        return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
+    }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
