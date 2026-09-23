@@ -4,6 +4,7 @@ import ee.liftertrans.controller.AuthRequestDto;
 import ee.liftertrans.controller.dto.AuthResponseDto;
 import ee.liftertrans.infrastructure.error.ApiError;
 import ee.liftertrans.infrastructure.exception.ForbiddenException;
+import ee.liftertrans.infrastructure.exception.UnauthorizedException;
 import ee.liftertrans.mapper.UserMapper;
 import ee.liftertrans.persistence.entity.User;
 import ee.liftertrans.persistence.repository.UserRepository;
@@ -22,7 +23,9 @@ public class AuthService {
     public AuthResponseDto login(AuthRequestDto authRequestDto){
         String email = authRequestDto.getEmail();
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new UnauthorizedException(ApiError.)    }
+                .orElseThrow(()->new UnauthorizedException("Vale e-post või parool", "INCORRECT_CREDENTIALS");
+        return userMapper.toAuthResponseDto(user);
+    }
 
 }
 
