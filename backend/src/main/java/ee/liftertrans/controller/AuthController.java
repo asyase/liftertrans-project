@@ -25,7 +25,6 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    @RequestBody
     @Valid
     @Operation(summary = "Sisse logimine.")
     @ApiResponses(value = {
