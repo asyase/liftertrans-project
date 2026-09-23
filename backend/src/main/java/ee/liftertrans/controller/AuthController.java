@@ -5,6 +5,7 @@ import ee.liftertrans.infrastructure.error.ApiError;
 import ee.liftertrans.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -33,14 +34,26 @@ public class AuthController {
                     description = "OK"
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Ebaõnnestus",
-                    content = @Content(schema = @Schema(implementation = ApiError.class))
+                    responseCode="400",
+                    description= "Vigased siseandmed",
+                    content = @Content( schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "error",
+                                    value = """
+                    {"message": "email: ei tohi olla tühi",
+                      "errorCode": "INCORRECT_INPUT"}
+                    """))
             ),
             @ApiResponse(
-                    responseCode = "401",
-                    description = "Vale e-post/parool",
-                    content = @Content(schema = @Schema(implementation = ApiError.class))
+                    responseCode="401",
+                    description= "Vale e-post või parool",
+                    content = @Content( schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "INCORRECT_CREDENTIALS",
+                                    value = """
+                            {"message": "Vale e-post või parool",
+                              "errorCode": "INCORRECT_CREDENTIALS"}
+                            """))
             )
     })
     public AuthResponseDto login(@RequestBody @Valid AuthRequestDto authRequestDto){
