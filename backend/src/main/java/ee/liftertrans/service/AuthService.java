@@ -9,6 +9,7 @@ import ee.liftertrans.mapper.UserMapper;
 import ee.liftertrans.persistence.entity.User;
 import ee.liftertrans.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,13 +20,22 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthResponseDto login(AuthRequestDto authRequestDto){
+    public AuthResponseDto login(AuthRequestDto authRequestDto) {
         String email = authRequestDto.getEmail();
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new UnauthorizedException("Vale e-post või parool", "INCORRECT_CREDENTIALS");
+                .orElseThrow(() -> new UnauthorizedException("Vale e-post või parool", "INCORRECT_CREDENTIALS"));
+
+        if (!passwordEncoder.matches(
+                authRequestDto.getPassword(),
+                user.getPasswordHash()
+        ))
+            throw new UnauthorizedException(
+                    "Vale e-post või parool", "INCORRECT_CREDENTIALS"
+            );
+
         return userMapper.toAuthResponseDto(user);
     }
-
 }
 
