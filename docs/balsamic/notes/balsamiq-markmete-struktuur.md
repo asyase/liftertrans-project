@@ -95,6 +95,7 @@ message: "<backend message väli>"
     - Response DTO nimi (`<ResponseDtoClassName.java>`) käib vahetult enne `Response (200):` plokki.
     - Kui operatsioonil pole request body't (nt lihtne GET/DELETE), jäta `Request body` osa täielikult ära ja alusta otse response DTO-st.
     - Kui operatsioonil pole response body't (nt POST/PUT/DELETE, mis tagastab tühja 200), kirjuta `Response (200): NONE` ilma DTO nimeta selle kohal.
+- **JSON massiivide (array) reegel:** Kui JSON näidises on massiiv (juurtasemel või objekti sees), pannakse näidisesse ainult üks element, mille järel on koma ja järgmisel real `...` (kolm punkti), mis viitab sellele, et elemente võib olla rohkem.
 - `API teenuse lisainfo` — lühike (1–3 rida) vabas vormis märkus teenuse käitumise kohta, mis pole väljanimedest endist ilmne. Näiteks: filtri erikäitumine (`cityId=0` tagastab kõik), valikulised väljad (`imageData` võib olla tühi string), soft delete, vms. Kui teenusel pole midagi sellist lisada, jäta väärtuseks `—`.
 - `Veateated` — iga veajuhtum on eraldi kolmerealine plokk, alati sama kolme võtmega samas järjekorras:
     - `HTTP:` — staatuskood (nt `404`, `403`)
@@ -151,16 +152,7 @@ Request body:
       "transactionTypeName": "raha sisse",
       "isAvailable": true
     },
-    {
-      "transactionTypeId": 2,
-      "transactionTypeName": "raha välja",
-      "isAvailable": true
-    },
-    {
-      "transactionTypeId": 3,
-      "transactionTypeName": "maksed",
-      "isAvailable": true
-    }
+    ...
   ]
 }
 
