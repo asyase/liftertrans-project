@@ -4,6 +4,7 @@ import ee.liftertrans.infrastructure.error.ApiError;
 import ee.liftertrans.infrastructure.exception.DataNotFoundException;
 import ee.liftertrans.infrastructure.exception.ForbiddenException;
 import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
+import ee.liftertrans.infrastructure.exception.UnauthorizedException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -25,6 +26,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler
     public ResponseEntity<ApiError> handleUnauthorizedException(
             UnauthorizedException exception
     ) {
