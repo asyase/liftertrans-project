@@ -12,4 +12,19 @@ export default {
       },
     })
   },
+
+  getJobTypesRequest() {
+    // Küsime backendilt töö tüüpide nimekirja
+    return axios.get('/api/jobs/types')
+  },
+
+  getExecutionTypesRequest() {
+    // Küsime backendilt teostamise viiside nimekirja
+    return axios.get('/api/jobs/execution-types')
+  },
+
+  postJobRequest(jobCreateRequestDto) {
+    // Saadame uue töö andmed backendile
+    return axios.post('/api/jobs', jobCreateRequestDto)
+  },
 }

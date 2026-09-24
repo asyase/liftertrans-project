@@ -5,6 +5,7 @@ import ErrorView from '@/views/ErrorView.vue'
 import LoginView from '@/views/LoginView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import MyJobsView from '@/views/MyJobsView.vue'
+import JobCreateEditView from '@/views/JobCreateEditView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,7 +35,7 @@ const router = createRouter({
     },
 
     {
-      path: '/dashbord',
+      path: '/dashboard',
       name: 'dashboardRoute',
       component: DashboardView,
     },
@@ -43,6 +44,11 @@ const router = createRouter({
       path: '/my-jobs',
       name: 'myJobsRoute',
       component: MyJobsView,
+    },
+    {
+      path: '/jobs/new',
+      name: 'job-create',
+      component: JobCreateEditView,
     },
   ],
 })
