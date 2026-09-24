@@ -1,82 +1,48 @@
 # AdminView.vue - Balsamiq märkmed
 
+Balsamiqu leht: **ADMIN**
+
 ## Vaate märkmed
 
+```text
 Roll: Admin
-
 Failinimi: AdminView.vue
-
-Frontend rada:
-/dashboard
+Frontend rada: /dashboard
 
 Vaatega seotud lisainfo:
+Avaneb ADMIN kasutajale pärast sisselogimist; vasakul külgmenüü (Esileht, Kalender, Tellimused, Kliendid, Autod, Juhid, Alltöövõtjad, Logi välja).
+Lehe avamisel laetakse tänased tööd (GET /api/jobs, date = tänane kuupäev). Loendurid arvutab frontend samast nimekirjast: Tänased tööd = kõik (sh DRAFT), Planeeritud = PLANNED, Töös = IN_PROGRESS, Lõpetatud = COMPLETED.
+Tabel on sorteeritud plannedStartTime järgi; mobiilis kuvatakse ainult Kellaaeg, Klient, Staatus ning "+ Lisa uus tellimus" ja "Tänased tööd" on enne kalendrit.
+"+ Lisa uus tellimus" → /jobs/new, "Vaata" → /jobs/:id, "Vaata kogu kalendrit" → /calendar (ainult navigeerimine).
+```
 
-Admin dashboard avaneb ADMIN rolliga kasutajale kohe pärast edukat sisselogimist.
+## API märkmed — GET /api/jobs
 
-Desktop-vaates asub vasakul külgmenüü:
-- Esileht
-- Kalender
-- Tellimused
-- Kliendid
-- Autod
-- Juhid
-- Alltöövõtjad
-- Logi välja
+```text
+API: GET /api/jobs
 
-Mobiilivaates kasutatakse kompaktsemat navigatsiooni.
+JobListDto.java
+Response (200):
+[
+  {
+    "jobId": 2,
+    "plannedStartTime": "2026-09-25T09:00:00",
+    "customerName": "Mari Mets",
+    "jobType": "TRANSPORT_AND_CRANE",
+    "pickupAddress": "Pärnu mnt 145, Tallinn",
+    "serviceAddress": null,
+    "deliveryAddress": "Mustamäe tee 5, Tallinn",
+    "vehicleRegistrationNumber": "876HGF",
+    "driverName": "Mart Tamm",
+    "subcontractorName": null,
+    "status": "PLANNED"
+  },
+  ...
+]
 
-Dashboardi ülaosas kuvatakse tänase päeva tööde loendurid:
-- Tänased tööd
-- Planeeritud
-- Töös
-- Lõpetatud
+API teenuse lisainfo:
+Tagastab tööde nimekirja valikuliste query parameetrite järgi (date, from, to, vehicleId, driverId, customerId, subcontractorId, status), järjestatuna plannedStartTime järgi; tulemusi pole → tühi massiiv. Selles vaates saadetakse date=<tänane kuupäev>.
+Sama endpointi kasutavad dashboard, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
 
-"Tänased tööd" loendur sisaldab kõiki töid, mille planned_start_time kuupäev on tänane kuupäev, sõltumata staatusest.
-
-"Planeeritud" loendur sisaldab ainult PLANNED staatusega tänaseid töid.
-
-"Töös" loendur sisaldab ainult IN_PROGRESS staatusega tänaseid töid.
-
-"Lõpetatud" loendur sisaldab ainult COMPLETED staatusega tänaseid töid.
-
-DRAFT staatusega töö kuulub "Tänased tööd" koguarvu sisse, kuid sellele eraldi loendurikaarti ei kuvata.
-
-Tänaste tööde tabel kuvab ainult töid, mille planned_start_time kuupäev on tänane kuupäev.
-
-Tööd kuvatakse planned_start_time järgi kasvavas järjekorras.
-
-Desktop-vaates kuvatakse tabelis:
-- Kellaaeg
-- Klient
-- Töö tüüp
-- Auto
-- Juht
-- Staatus
-- Tegevus
-
-Mobiilivaates kuvatakse lihtsustatud tabel:
-- Kellaaeg
-- Klient
-- Staatus
-
-Frontend kuvab API enum väärtused kasutajasõbralike nimetustega:
-
-Töö staatus:
-- DRAFT -> Uus
-- PLANNED -> Planeeritud
-- IN_PROGRESS -> Töös
-- COMPLETED -> Lõpetatud
-
-Töö tüüp:
-- TRANSPORT_AND_CRANE -> Transport + kraanatöö
-- CRANE_ONLY -> Kraanatöö
-
-Eraldiseisvat "Transport" töö tüüpi süsteemis ei ole.
-
-Nupp "+ Lisa uus tellimus" suunab uue tellimuse lisamise vormile.
-
-Tabeli rea tegevus "Vaata" suunab valitud töö detailvaatesse.
-
-"Vaata kogu kalendrit" suunab Kalender vaatele.
-
-Kalendris kuvatakse töödega kuupäevad ning kuupäevale vajutades kuvatakse valitud päeva tööd.
+Veateated: —
+```
