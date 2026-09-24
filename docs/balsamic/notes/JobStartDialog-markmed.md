@@ -22,10 +22,18 @@ API: POST /api/jobs/{jobId}/start
 Response (200): NONE
 
 API teenuse lisainfo:
-Lubatud ainult PLANNED tööl: salvestab actual_start_time = praegune aeg, staatus → IN_PROGRESS ja job_status_history rea (changed_by = juhi e-post).
+Lubatud ainult tööle määratud juhile ja ainult PLANNED tööl: salvestab actual_start_time = praegune aeg, staatus → IN_PROGRESS ja job_status_history rea (changed_by = juhi e-post).
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
+
+HTTP: 409
+errorCode: INVALID_STATUS_TRANSITION
+message: "Tööd saab alustada ainult PLANNED staatuses"
 ```

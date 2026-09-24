@@ -13,6 +13,7 @@ Vaatega seotud lisainfo:
 /vehicles/new → "Lisa auto" (tühi vorm); /vehicles/:id/edit → "Muuda autot", väljad ja tõstevõime read eeltäidetakse GET /api/vehicles/{vehicleId} abil.
 Tõstevõime ridu lisatakse ("+ Lisa tõstevõime" → Lisa) ja kustutatakse vormis; need salvestatakse koos autoga (VEHICLE 1:N CRANE_CAPACITY), vehicle.crane_capacity_kg / crane_reach_m välju ei kasutata.
 Salvesta → POST või PUT, seejärel tagasi /vehicles; Tühista → tagasi ilma API kutseta.
+/vehicles/new?subcontractorId=:id (avatakse alltöövõtja detailvaatest) lisab POST päringusse subcontractorId; /vehicles/new ilma parameetrita → oma auto (subcontractorId = null).
 ```
 
 ## API märkmed — GET /api/vehicles/{vehicleId}
@@ -94,6 +95,10 @@ message: "registrationNumber: must not be blank"
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'subcontractorId' väärtusega: 5"
+
+HTTP: 409
+errorCode: DUPLICATE_RESOURCE
+message: "Sama registreerimisnumbriga auto on juba olemas"
 ```
 
 ## API märkmed — PUT /api/vehicles/{vehicleId}
@@ -136,4 +141,8 @@ message: "registrationNumber: must not be blank"
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'vehicleId' väärtusega: 99"
+
+HTTP: 409
+errorCode: DUPLICATE_RESOURCE
+message: "Sama registreerimisnumbriga auto on juba olemas"
 ```

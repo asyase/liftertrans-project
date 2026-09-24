@@ -12,7 +12,7 @@ Frontend rada: /jobs/:jobId/cargo/new ja /jobs/:jobId/cargo/:cargoId/edit
 Vaatega seotud lisainfo:
 Avaneb tellimuse vormist ("+ Lisa kaup", loomise režiim) või töö detailvaate Kaup vahekaardilt ("Muuda", muutmise režiim, väljad eeltäidetud). Päises kuvatakse tellimuse number ja staatus (GET /api/jobs/{jobId}).
 Loomise režiim: Salvesta / Tühista. Muutmise režiim: Salvesta muudatused / Kustuta kaup (küsib kinnitust) / Tühista.
-Kõik nupud viivad tagasi tellimuse juurde; kauba lisamine, muutmine või kustutamine ei muuda töö staatust (cargo.job_id = job.id). Foto on valikuline.
+Kõik nupud viivad tagasi tellimuse juurde; kauba lisamine, muutmine või kustutamine ei muuda töö staatust (cargo.job_id = job.id). Foto on valikuline (JPEG või PNG, kuni 10 MB; kontroll nii frontendis kui backendis).
 ```
 
 ## API märkmed — GET /api/jobs/{jobId}
@@ -56,9 +56,13 @@ Response (200):
 }
 
 API teenuse lisainfo:
-Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated.
+Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated. DRIVER saab avada ainult talle määratud töö (job.driver_id = autentitud kasutaja driverId).
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -115,11 +119,16 @@ Response (200): NONE
 
 API teenuse lisainfo:
 Lisab kauba olemasolevale tellimusele (cargo.job_id = jobId); töö staatus EI muutu. cargoPhotoData on tühi string, kui fotot ei lisata; foto korral salvestab backend faili serveri kausta uploads/jobs/{jobId}/cargo/ ja kirjutab välja cargo_photo_url aadressi /uploads/jobs/{jobId}/cargo/<failinimi>.
+Foto: ainult image/jpeg või image/png, kuni 10 MB (backend kontrollib sisu tüüpi ja suurust, mitte ainult faililaiendit).
 
 Veateated:
 HTTP: 400
 errorCode: INCORRECT_INPUT
 message: "description: must not be blank"
+
+HTTP: 400
+errorCode: INCORRECT_INPUT
+message: "cargoPhotoData: lubatud on JPEG- või PNG-pilt kuni 10 MB"
 
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
@@ -148,11 +157,16 @@ Response (200): NONE
 
 API teenuse lisainfo:
 Muudab kaubarida; töö staatus EI muutu. cargoPhotoData tühi string → olemasolev foto jääb alles; uus foto salvestatakse kausta uploads/jobs/{jobId}/cargo/ ja asendab cargo_photo_url väärtuse.
+Foto: ainult image/jpeg või image/png, kuni 10 MB (backend kontrollib sisu tüüpi ja suurust, mitte ainult faililaiendit).
 
 Veateated:
 HTTP: 400
 errorCode: INCORRECT_INPUT
 message: "description: must not be blank"
+
+HTTP: 400
+errorCode: INCORRECT_INPUT
+message: "cargoPhotoData: lubatud on JPEG- või PNG-pilt kuni 10 MB"
 
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND

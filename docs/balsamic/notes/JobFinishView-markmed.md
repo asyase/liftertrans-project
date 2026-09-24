@@ -56,9 +56,13 @@ Response (200):
 }
 
 API teenuse lisainfo:
-Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated.
+Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated. DRIVER saab avada ainult talle määratud töö (job.driver_id = autentitud kasutaja driverId).
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -81,12 +85,20 @@ Response (200): NONE
 
 API teenuse lisainfo:
 Frontend saadab faili Base64 kujul (fileData). Backend salvestab faili serveri kausta uploads/jobs/{jobId}/documents/ ja loob job_document rea (file_name, file_url = /uploads/jobs/{jobId}/documents/<failinimi>, uploaded_at = praegune aeg).
-Failid serveeritakse aadressilt /uploads/**, seega "Vaata" avab fileUrl-i otse ilma eraldi API kutseta.
+Lubatud on application/pdf, image/jpeg ja image/png kuni 10 MB (backend kontrollib sisu tüüpi ja suurust). Juht saab lisada faile ainult talle määratud tööle; failid serveeritakse aadressilt /uploads/**.
 
 Veateated:
 HTTP: 400
 errorCode: INCORRECT_INPUT
 message: "documentType: must not be blank"
+
+HTTP: 400
+errorCode: INCORRECT_INPUT
+message: "fileData: lubatud on PDF-, JPEG- või PNG-fail kuni 10 MB"
+
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
 
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
@@ -108,10 +120,18 @@ Request body:
 Response (200): NONE
 
 API teenuse lisainfo:
-Lubatud ainult IN_PROGRESS tööl: actual_finish_time = praegune aeg, actual_hours arvutatakse actual_start_time ja actual_finish_time vahest, staatus → COMPLETED. comment salvestatakse job_status_history.comment väljale.
+Lubatud ainult tööle määratud juhile ja ainult IN_PROGRESS tööl: actual_finish_time = praegune aeg, actual_hours arvutatakse actual_start_time ja actual_finish_time vahest, staatus → COMPLETED. comment salvestatakse COMPLETED staatuse ajaloo reale (job_status_history.comment); job.notes (admini märkused) ei muutu.
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
+
+HTTP: 409
+errorCode: INVALID_STATUS_TRANSITION
+message: "Tööd saab lõpetada ainult IN_PROGRESS staatuses"
 ```

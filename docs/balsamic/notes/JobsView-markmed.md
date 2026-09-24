@@ -13,6 +13,7 @@ Vaatega seotud lisainfo:
 Lehe avamisel laetakse kõigi tööde nimekiri. Kiirfiltrid PLANNED / IN_PROGRESS / COMPLETED ja rippmenüüd Kuupäev, Auto, Juht, Staatus laadivad nimekirja uuesti valitud filtritega.
 Juht/alltöövõtja veerus kuvatakse driverName või SUBCONTRACTED töö korral subcontractorName; aadressiveerus CRANE_ONLY töö puhul serviceAddress.
 "+ Lisa uus tellimus" → /jobs/new, "Vaata" → /jobs/:id, "Muuda" → /jobs/:id/edit (ainult navigeerimine).
+Nupp "Kaup" (ühemõttelisem nimi: "Vaata kaupa") avab /jobs/:id vahekaardil Kaup — eraldi API kutset ega kaubavaadet pole.
 ```
 
 ## API märkmed — GET /api/jobs
@@ -41,7 +42,8 @@ Response (200):
 
 API teenuse lisainfo:
 Tagastab tööde nimekirja valikuliste query parameetrite järgi (date, from, to, vehicleId, driverId, customerId, subcontractorId, status), järjestatuna plannedStartTime järgi; tulemusi pole → tühi massiiv. Selles vaates saadetakse valikulised date, vehicleId, driverId, status.
-Sama endpointi kasutavad dashboard, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
+Sama endpointi kasutavad dashboardi tänaste tööde tabel, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
+DRIVER rolliga kasutajale tagastatakse alati ainult talle määratud tööd: driverId võetakse autentitud kasutajast (accessToken), mitte query parameetrist.
 
 Veateated: —
 ```

@@ -10,7 +10,7 @@ Failinimi: JobCreateEditView.vue
 Frontend rada: /jobs/new ja /jobs/:id/edit
 
 Vaatega seotud lisainfo:
-VANA VARIANT: see leht on tellimuse vormi varasem versioon (vana route /tellimused/uus, töö tüüp "Transport + kraanatöö", kauba tabel vormi sees, nupp "Koosta saateleht").
+DEPRECATED — mitte realiseerida. See leht on tellimuse vormi varasem versioon (kauba tabel vormi sees, nupp "Koosta saateleht") ja soovitatav on see lõplikust mockupist eemaldada.
 Kehtiv vorm ja kõik selle API märkmed on lehel "LISA / MUUDA TELLIMUST" (JobCreateEditView.vue).
 ```
 

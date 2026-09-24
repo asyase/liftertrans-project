@@ -10,9 +10,10 @@ Failinimi: DriverJobDetailView.vue
 Frontend rada: /my-jobs/:id
 
 Vaatega seotud lisainfo:
-Lehe avamisel laetakse töö andmed ja kaubaread (kirjeldus, kogus, kaal, mõõdud, foto).
+Lehe avamisel laetakse töö andmed ja kaubaread (kirjeldus, kogus, kaal, mõõdud, foto); juht saab avada ainult talle määratud töö (muul juhul 403).
 Nupud sõltuvad staatusest: PLANNED → "Alusta töö" (avab JobStartDialog.vue), IN_PROGRESS → "Lõpeta töö" (→ /my-jobs/:id/finish).
-"Ava saateleht" (→ /jobs/:id/waybill) ja "Lisa dokument" (→ /my-jobs/:id/documents/new) on alati nähtavad.
+"Ava saateleht" (→ /jobs/:id/waybill, ainult vaatamine) ja "Lisa dokument" (→ /my-jobs/:id/documents/new) on alati nähtavad.
+Nupp "Muuda saatelehte" tuleb asendada nupuga "Lisa saatelehe foto" (→ /my-jobs/:id/documents/new, tüüp WAYBILL_PHOTO) — juht saatelehe andmeid ei muuda.
 ```
 
 ## API märkmed — GET /api/jobs/{jobId}
@@ -56,9 +57,13 @@ Response (200):
 }
 
 API teenuse lisainfo:
-Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated.
+Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated. DRIVER saab avada ainult talle määratud töö (job.driver_id = autentitud kasutaja driverId).
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -91,6 +96,10 @@ API teenuse lisainfo:
 Tagastab tellimuse kõik kaubaread (cargo.job_id = jobId). Kaupu pole → tühi massiiv.
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"

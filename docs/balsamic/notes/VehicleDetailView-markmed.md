@@ -61,10 +61,14 @@ API: DELETE /api/vehicles/{vehicleId}
 Response (200): NONE
 
 API teenuse lisainfo:
-Kustutab auto ID alusel pärast kinnitust kinnitusaknas koos auto tõstevõime ridadega (crane_capacity).
+Kustutab auto ID alusel pärast kinnitust kinnitusaknas koos auto tõstevõime ridadega (crane_capacity). Kui autoga on seotud töid (job.vehicle_id), autot ei kustutata.
 
 Veateated:
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'vehicleId' väärtusega: 99"
+
+HTTP: 409
+errorCode: RESOURCE_IN_USE
+message: "Autot ei saa kustutada, sest sellega on seotud töid"
 ```

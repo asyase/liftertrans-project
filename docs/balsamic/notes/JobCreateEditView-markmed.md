@@ -164,9 +164,13 @@ Response (200):
 }
 
 API teenuse lisainfo:
-Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated.
+Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated. DRIVER saab avada ainult talle määratud töö (job.driver_id = autentitud kasutaja driverId).
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -206,12 +210,16 @@ Response (200):
 }
 
 API teenuse lisainfo:
-Loob töö staatusega DRAFT ja job_status_history rea (NULL → DRAFT). Aadressid sõltuvad jobType'ist (CRANE_ONLY → serviceAddress; TRANSPORT_AND_CRANE → pickupAddress + deliveryAddress). INTERNAL: subcontractorId = null; SUBCONTRACTED: driverId = null (DB JOB_assignment_ck).
+Loob töö staatusega DRAFT ja job_status_history rea (NULL → DRAFT). Aadressid sõltuvad jobType'ist (CRANE_ONLY → serviceAddress; TRANSPORT_AND_CRANE → pickupAddress + deliveryAddress). INTERNAL: subcontractorId = null, auto peab olema oma auto (vehicle.subcontractor_id = null); SUBCONTRACTED: subcontractorId kohustuslik, driverId = null ja valitud vehicleId peab kuuluma samale alltöövõtjale.
 
 Veateated:
 HTTP: 400
 errorCode: INCORRECT_INPUT
 message: "jobType: must not be blank"
+
+HTTP: 400
+errorCode: INCORRECT_INPUT
+message: "vehicleId: auto ei kuulu valitud alltöövõtjale"
 
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
@@ -254,6 +262,10 @@ HTTP: 400
 errorCode: INCORRECT_INPUT
 message: "jobType: must not be blank"
 
+HTTP: 400
+errorCode: INCORRECT_INPUT
+message: "vehicleId: auto ei kuulu valitud alltöövõtjale"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -271,9 +283,17 @@ Viib DRAFT töö PLANNED staatusesse ja lisab job_status_history rea (DRAFT → 
 Kinnitamisel luuakse tööle transport_document rida (saatelehe number kujul ST-<aasta>-<järjekorranumber>, saatja = klient, vedaja = LIFTERTRANS või alltöövõtja, loading_date / delivery_date = planeeritud algus / lõpp).
 
 Veateated:
+HTTP: 400
+errorCode: INCORRECT_INPUT
+message: "driverId: INTERNAL töö kinnitamiseks peab juht olema määratud"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
+
+HTTP: 409
+errorCode: INVALID_STATUS_TRANSITION
+message: "Tellimust saab kinnitada ainult DRAFT staatuses"
 ```
 
 ## API märkmed — GET /api/jobs/{jobId}/cargo
@@ -303,6 +323,10 @@ API teenuse lisainfo:
 Tagastab tellimuse kõik kaubaread (cargo.job_id = jobId). Kaupu pole → tühi massiiv.
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"

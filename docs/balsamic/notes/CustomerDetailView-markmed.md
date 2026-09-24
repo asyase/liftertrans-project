@@ -69,7 +69,8 @@ Response (200):
 
 API teenuse lisainfo:
 Tagastab tööde nimekirja valikuliste query parameetrite järgi (date, from, to, vehicleId, driverId, customerId, subcontractorId, status), järjestatuna plannedStartTime järgi; tulemusi pole → tühi massiiv. Selles vaates saadetakse customerId=<kliendi ID>.
-Sama endpointi kasutavad dashboard, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
+Sama endpointi kasutavad dashboardi tänaste tööde tabel, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
+DRIVER rolliga kasutajale tagastatakse alati ainult talle määratud tööd: driverId võetakse autentitud kasutajast (accessToken), mitte query parameetrist.
 
 Veateated: —
 ```
@@ -82,10 +83,14 @@ API: DELETE /api/customers/{customerId}
 Response (200): NONE
 
 API teenuse lisainfo:
-Kustutab kliendi ID alusel pärast kasutaja kinnitust kinnitusaknas.
+Kustutab kliendi ID alusel pärast kasutaja kinnitust kinnitusaknas. Kui kliendiga on seotud töid (job.customer_id), klienti ei kustutata.
 
 Veateated:
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'customerId' väärtusega: 99"
+
+HTTP: 409
+errorCode: RESOURCE_IN_USE
+message: "Klienti ei saa kustutada, sest temaga on seotud töid"
 ```

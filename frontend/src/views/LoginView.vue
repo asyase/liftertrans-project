@@ -10,7 +10,6 @@ export default {
       email: '',
       password: '',
       errorMessage: '',
-      isLoading: false,
     }
   },
 
@@ -25,9 +24,6 @@ export default {
         return
       }
 
-      // Käivita laadimine
-      this.isLoading = true
-
       // Valmista backendile saadetavad andmed
       const authRequestDto = {
         email: this.email,
@@ -38,9 +34,6 @@ export default {
       AuthService.postLoginRequest(authRequestDto)
         .then((response) => this.handleLoginResponse(response)) // Edukas vastus
         .catch((error) => this.handleLoginError(error)) // Veateade
-        .finally(() => {
-          this.isLoading = false // Lõpeta laadimine
-        })
     },
 
     // Töötle edukat sisselogimist
@@ -50,6 +43,16 @@ export default {
 
       console.log('Sisselogimine ok')
       console.log('Roll', user.roleName)
+
+      if (user.roleName === 'ADMIN') {
+        return this.$router.push('/dashboard')
+      }
+
+      if (user.roleName === 'DRIVER') {
+        return this.$router.push('/my-jobs')
+      }
+
+      this.errorMessage='Tundmatu kasutajaroll'
     },
 
     // Töötle sisselogimise viga
@@ -58,9 +61,6 @@ export default {
       this.errorMessage = error.response?.data?.message || 'Sisselogimine ebaõnnestus'
     },
   },
-
-  // TODO: suunamine /dashboard /my-jobs
-  // TODO: spinneri parandamine
 }
 </script>
 
@@ -88,13 +88,7 @@ export default {
           <label>Parool</label>
         </div>
 
-        <button type="button" @click="login" :disabled="isLoading" class="btn btn-danger">
-          Logi sisse
-        </button>
-
-        <div class="spinner-border text-danger" role="status">
-          <span class="visually-hidden">Login sisse...</span>
-        </div>
+        <button type="button" @click="login" class="btn btn-danger">Logi sisse</button>
       </div>
     </div>
   </div>

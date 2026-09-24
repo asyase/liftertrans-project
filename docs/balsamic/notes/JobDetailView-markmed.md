@@ -57,9 +57,13 @@ Response (200):
 }
 
 API teenuse lisainfo:
-Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated.
+Tagastab ühe töö koos kliendi, auto, juhi ja alltöövõtja andmetega. actual* väljad täituvad töö alustamisel ja lõpetamisel. Sama vastust kasutavad admini detailvaade, tellimuse ja kauba vorm ning juhi vaated. DRIVER saab avada ainult talle määratud töö (job.driver_id = autentitud kasutaja driverId).
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -92,6 +96,10 @@ API teenuse lisainfo:
 Tagastab tellimuse kõik kaubaread (cargo.job_id = jobId). Kaupu pole → tühi massiiv.
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -122,7 +130,7 @@ JobDocumentDto.java
 Response (200):
 [
   {
-    "jobDocumentId": 1,
+    "documentId": 1,
     "documentType": "DELIVERY_PHOTO",
     "fileName": "delivery-job-4.jpg",
     "fileUrl": "/demo/documents/delivery-job-4.jpg",
@@ -135,6 +143,10 @@ API teenuse lisainfo:
 documentType: DELIVERY_PHOTO / WAYBILL_PHOTO / CARGO_PHOTO / OTHER (DB JOB_DOCUMENT_type_ck). "Vaata" avab fileUrl-i otse, eraldi API kutset pole.
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -183,4 +195,8 @@ Veateated:
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
+
+HTTP: 409
+errorCode: INVALID_STATUS_TRANSITION
+message: "Tellimust saab tühistada ainult DRAFT või PLANNED staatuses"
 ```

@@ -10,7 +10,7 @@ Failinimi: DriverJobsView.vue
 Frontend rada: /my-jobs
 
 Vaatega seotud lisainfo:
-Avaneb DRIVER kasutajale pärast sisselogimist; näitab sisselogitud juhi (sessionStorage driverId) tänaseid töid ja plokki "Järgmine töö".
+Avaneb DRIVER kasutajale pärast sisselogimist; näitab sisselogitud juhi tänaseid töid (backend määrab juhi accessTokenist, teiste juhtide töid ei tagastata) ja plokki "Järgmine töö".
 UI staatuse sildid: DRAFT → Uus, PLANNED → Planeeritud, IN_PROGRESS → Töös, COMPLETED → Lõpetatud, CANCELLED → Tühistatud.
 "Alusta töö" on nähtav ainult PLANNED tööl ja avab modaalakna JobStartDialog.vue. "Vaata" / "Vaata tööd" → /my-jobs/:id (ainult navigeerimine).
 ```
@@ -40,8 +40,9 @@ Response (200):
 ]
 
 API teenuse lisainfo:
-Tagastab tööde nimekirja valikuliste query parameetrite järgi (date, from, to, vehicleId, driverId, customerId, subcontractorId, status), järjestatuna plannedStartTime järgi; tulemusi pole → tühi massiiv. Selles vaates saadetakse driverId=<sessionStorage driverId> ja date=<tänane kuupäev>.
-Sama endpointi kasutavad dashboard, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
+Tagastab tööde nimekirja valikuliste query parameetrite järgi (date, from, to, vehicleId, driverId, customerId, subcontractorId, status), järjestatuna plannedStartTime järgi; tulemusi pole → tühi massiiv. Selles vaates saadetakse ainult date=<tänane kuupäev>; juhi tööd valib backend accessTokeni järgi.
+Sama endpointi kasutavad dashboardi tänaste tööde tabel, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
+DRIVER rolliga kasutajale tagastatakse alati ainult talle määratud tööd: driverId võetakse autentitud kasutajast (accessToken), mitte query parameetrist.
 
 Veateated: —
 ```

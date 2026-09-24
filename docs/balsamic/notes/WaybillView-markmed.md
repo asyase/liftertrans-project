@@ -51,6 +51,10 @@ API teenuse lisainfo:
 Saatelehe päis (number, saatja, saaja, vedaja, kuupäevad, PDF-i aadress) tuleb tabelist transport_document (üks rida töö kohta, luuakse tellimuse kinnitamisel); juht, auto ja kaubaread töö seostest. generatedFileUrl on null, kuni PDF-i pole veel genereeritud.
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"
@@ -71,6 +75,10 @@ API teenuse lisainfo:
 Genereerib saatelehe PDF-i töö hetkeandmetest (transport_document, klient, juht, auto, kaubaread), salvestab selle kausta uploads/waybills/<documentNumber>.pdf (vana fail kirjutatakse üle) ja uuendab transport_document.generated_file_url väärtust.
 
 Veateated:
+HTTP: 403
+errorCode: ACCESS_DENIED
+message: "Sul puudub õigus selle töö andmetele"
+
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'jobId' väärtusega: 99"

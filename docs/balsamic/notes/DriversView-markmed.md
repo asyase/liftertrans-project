@@ -46,10 +46,14 @@ API: DELETE /api/drivers/{driverId}
 Response (200): NONE
 
 API teenuse lisainfo:
-Kustutab juhi ID alusel pärast kinnitust kinnitusaknas.
+Kustutab juhi ID alusel pärast kinnitust kinnitusaknas. Kui juhiga on seotud töid (job.driver_id), juhti ei kustutata — mitteaktiivseks muutmiseks kasutatakse active = false.
 
 Veateated:
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'driverId' väärtusega: 99"
+
+HTTP: 409
+errorCode: RESOURCE_IN_USE
+message: "Juhti ei saa kustutada, sest temaga on seotud töid"
 ```

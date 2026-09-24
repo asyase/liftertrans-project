@@ -12,7 +12,7 @@ Frontend rada: /login
 Vaatega seotud lisainfo:
 Leht on esimene vaade sisselogimisel, menüüd lehel ei ole. Väli "Kasutajanimi / e-post" saadetakse backendile email väljana — kasutajanimega sisse logida ei saa.
 Enne saatmist kontrollitakse, kas väljad on täidetud — kui ei ole, kuvatakse veateade "E-post on kohustuslik" või "Parool on kohustuslik". Kui backend vastab errorCode'ga INCORRECT_CREDENTIALS, kuvatakse backendi message väli ("Vale e-post või parool").
-Eduka sisselogimise korral salvestatakse userId, roleName ja driverId sessionStorage'isse ning kasutaja suunatakse rolli järgi: ADMIN → /dashboard, DRIVER → /my-jobs.
+Eduka sisselogimise korral salvestatakse accessToken, roleName ja driverId sessionStorage'isse ning kasutaja suunatakse rolli järgi: ADMIN → /dashboard, DRIVER → /my-jobs. Kõik järgmised päringud saadavad accessTokeni päises Authorization: Bearer.
 ```
 
 ## API märkmed — POST /api/auth/login
@@ -33,11 +33,12 @@ Response (200):
   "userId": 1,
   "email": "admin@liftertrans.ee",
   "roleName": "ADMIN",
-  "driverId": null
+  "driverId": null,
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9..."
 }
 
 API teenuse lisainfo:
-Kasutaja otsitakse email järgi ja parooli kontrollitakse BCrypt räsiga (user tabeli password_hash). roleName on "ADMIN" või "DRIVER". driverId on ADMIN kasutajal null, DRIVER kasutajal täidetud (nt mart.tamm@liftertrans.ee → "driverId": 1). Juhi aktiivsust (driver.active) ei kontrollita.
+Kasutaja otsitakse email järgi ja parooli kontrollitakse BCrypt räsiga (user tabeli password_hash). roleName on "ADMIN" või "DRIVER". driverId on ADMIN kasutajal null, DRIVER kasutajal täidetud (nt mart.tamm@liftertrans.ee → "driverId": 1). accessToken (allkirjastatud JWT, piiratud kehtivusega) saadetakse kõigis järgmistes päringutes päises Authorization: Bearer <token>; backend määrab sellest kasutaja rolli ja driverId ning kontrollib õigusi.
 
 Veateated:
 HTTP: 400

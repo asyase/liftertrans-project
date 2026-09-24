@@ -13,6 +13,7 @@ Vaatega seotud lisainfo:
 Lehe avamisel laetakse alltöövõtja andmed, talle määratud tööd ja tema autod (VEHICLE.subcontractor_id). SUBCONTRACTED töödel LIFTERTRANS juhti ei määra.
 Autode tabelis "Vaata" → /vehicles/:id, "Muuda" → /vehicles/:id/edit, "Kustuta" küsib kinnitust ja kustutab auto.
 "Kustuta" (alltöövõtja) küsib kinnitust ja suunab /subcontractors; "Muuda" → /subcontractors/:id/edit.
+"+ Lisa auto" → /vehicles/new?subcontractorId=:id — sama auto vorm, auto seotakse selle alltöövõtjaga.
 ```
 
 ## API märkmed — GET /api/subcontractors/{subcontractorId}
@@ -69,7 +70,8 @@ Response (200):
 
 API teenuse lisainfo:
 Tagastab tööde nimekirja valikuliste query parameetrite järgi (date, from, to, vehicleId, driverId, customerId, subcontractorId, status), järjestatuna plannedStartTime järgi; tulemusi pole → tühi massiiv. Selles vaates saadetakse subcontractorId=<alltöövõtja ID>.
-Sama endpointi kasutavad dashboard, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
+Sama endpointi kasutavad dashboardi tänaste tööde tabel, kalender, tellimuste nimekiri, kliendi/juhi/alltöövõtja detailvaated ja juhi töölaud.
+DRIVER rolliga kasutajale tagastatakse alati ainult talle määratud tööd: driverId võetakse autentitud kasutajast (accessToken), mitte query parameetrist.
 
 Veateated: —
 ```
@@ -110,12 +112,16 @@ API: DELETE /api/subcontractors/{subcontractorId}
 Response (200): NONE
 
 API teenuse lisainfo:
-Kustutab alltöövõtja ID alusel pärast kinnitust kinnitusaknas.
+Kustutab alltöövõtja ID alusel pärast kinnitust kinnitusaknas. Kui alltöövõtjaga on seotud töid või autosid, alltöövõtjat ei kustutata.
 
 Veateated:
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'subcontractorId' väärtusega: 99"
+
+HTTP: 409
+errorCode: RESOURCE_IN_USE
+message: "Alltöövõtjat ei saa kustutada, sest temaga on seotud töid või autosid"
 ```
 
 ## API märkmed — DELETE /api/vehicles/{vehicleId}
@@ -126,10 +132,14 @@ API: DELETE /api/vehicles/{vehicleId}
 Response (200): NONE
 
 API teenuse lisainfo:
-Kustutab auto ID alusel pärast kinnitust kinnitusaknas koos auto tõstevõime ridadega (crane_capacity).
+Kustutab auto ID alusel pärast kinnitust kinnitusaknas koos auto tõstevõime ridadega (crane_capacity). Kui autoga on seotud töid (job.vehicle_id), autot ei kustutata.
 
 Veateated:
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'vehicleId' väärtusega: 99"
+
+HTTP: 409
+errorCode: RESOURCE_IN_USE
+message: "Autot ei saa kustutada, sest sellega on seotud töid"
 ```

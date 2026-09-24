@@ -50,10 +50,14 @@ API: DELETE /api/subcontractors/{subcontractorId}
 Response (200): NONE
 
 API teenuse lisainfo:
-Kustutab alltöövõtja ID alusel pärast kinnitust kinnitusaknas.
+Kustutab alltöövõtja ID alusel pärast kinnitust kinnitusaknas. Kui alltöövõtjaga on seotud töid või autosid, alltöövõtjat ei kustutata.
 
 Veateated:
 HTTP: 404
 errorCode: PRIMARY_KEY_NOT_FOUND
 message: "Ei leidnud primary keyd 'subcontractorId' väärtusega: 99"
+
+HTTP: 409
+errorCode: RESOURCE_IN_USE
+message: "Alltöövõtjat ei saa kustutada, sest temaga on seotud töid või autosid"
 ```
