@@ -1,6 +1,5 @@
 package ee.liftertrans.mapper;
 
-
 import ee.liftertrans.dto.AuthResponseDto;
 import ee.liftertrans.persistence.entity.User;
 import org.mapstruct.Mapper;
