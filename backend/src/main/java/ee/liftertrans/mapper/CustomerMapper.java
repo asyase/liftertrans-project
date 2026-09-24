@@ -1,6 +1,5 @@
 package ee.liftertrans.mapper;
 
-
 import ee.liftertrans.dto.CustomerListDto;
 import ee.liftertrans.persistence.entity.Customer;
 import org.mapstruct.Mapper;
@@ -28,11 +27,3 @@ public interface CustomerMapper {
 
     List<CustomerListDto> toCustomerDtos(List<Customer> customers);
 }
-private Integer id;
-private String name;
-private String companyName;
-private String companyRegistrationNumber;
-private String vatNumber;
-private String email;
-private String invoiceEmail;
-private String phone;
