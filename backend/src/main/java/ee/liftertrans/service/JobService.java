@@ -2,7 +2,7 @@ package ee.liftertrans.service;
 
 import ee.liftertrans.dto.JobCreateRequestDto;
 import ee.liftertrans.dto.JobCreateResponseDto;
-import ee.liftertrans.dto.JobListDto;
+import ee.liftertrans.dto.JobDto;
 import ee.liftertrans.dto.SelectOptionDto;
 import ee.liftertrans.infrastructure.exception.IncorrectInputException;
 import ee.liftertrans.mapper.JobMapper;
@@ -26,13 +26,13 @@ public class JobService {
     private final DriverService driverService;
 
 
-    public List<JobListDto> getJobs() {
+    public List<JobDto> getJobs() {
 
         // Võtame kõik tööd andmebaasist
         List<Job> jobs = jobRepository.findAll();
 
         // Muudame Entity objektid DTO objektideks
-        List<JobListDto> jobDtos = jobMapper.toJobListDtos(jobs);
+        List<JobDto> jobDtos = jobMapper.toJobDtos(jobs);
 
         return jobDtos;
     }

@@ -1,7 +1,7 @@
 package ee.liftertrans.mapper;
 import ee.liftertrans.dto.JobCreateResponseDto;
 import org.mapstruct.Mapping;
-import ee.liftertrans.dto.JobListDto;
+import ee.liftertrans.dto.JobDto;
 import ee.liftertrans.persistence.entity.Job;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
@@ -21,14 +21,14 @@ public interface JobMapper {
     @Mapping(source = "vehicle.registrationNumber", target = "vehicleRegistrationNumber")
     @Mapping(source = "driver.name", target = "driverName")
     @Mapping(source = "subcontractor.companyName", target = "subcontractorName")
-    JobListDto toJobListDto(Job job);
+    @Mapping(source = "plannedStartTime", target = "plannedStartTime")
+    JobDto toJobListDto(Job job);
 
-    // Job -> JobCreateResponseDto
+    List<JobDto> toJobDtos(List<Job> jobs);
 
     @Mapping(source = "id", target = "jobId")
     JobCreateResponseDto toJobCreateResponseDto(Job job);
 
     List<JobListDto> toJobListDtos(List<Job> jobs);
-
 
 }

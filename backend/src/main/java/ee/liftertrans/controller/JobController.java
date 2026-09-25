@@ -1,6 +1,7 @@
 package ee.liftertrans.controller;
 
 import ee.liftertrans.dto.*;
+import ee.liftertrans.dto.JobDto;
 import ee.liftertrans.service.JobService;
 import ee.liftertrans.infrastructure.error.ApiError;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,10 +34,10 @@ public class JobController {
                     description = "OK"
             )
     })
-    public List<JobListDto> getJobs() {
+    public List<JobDto> getJobs() {
 
         // Küsime service'ilt tööde nimekirja
-        List<JobListDto> jobs = jobService.getJobs();
+        List<JobDto> jobs = jobService.getJobs();
 
         return jobs;
     }

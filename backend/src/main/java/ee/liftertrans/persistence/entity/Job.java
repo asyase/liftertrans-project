@@ -1,93 +1,84 @@
 package ee.liftertrans.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
+@Getter
+@Setter
 @Entity
-@Table(name = "job")
-@Data
-@NoArgsConstructor
+@Table(name = "job", schema = "liftertrans_project")
 public class Job {
-
     @Id
+    @Column(name = "id", nullable = false)
     private Integer id;
-
-    @ManyToOne
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")
     private Driver driver;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subcontractor_id")
     private Subcontractor subcontractor;
-
-    @Column(name = "job_type")
+    @Size(max = 30)
+    @NotNull
+    @Column(name = "job_type", nullable = false, length = 30)
     private String jobType;
-
-    @Column(name = "execution_type")
+    @Size(max = 20)
+    @NotNull
+    @Column(name = "execution_type", nullable = false, length = 20)
     private String executionType;
-
+    @Size(max = 255)
     @Column(name = "pickup_address")
     private String pickupAddress;
-
+    @Size(max = 255)
     @Column(name = "delivery_address")
     private String deliveryAddress;
-
+    @Size(max = 255)
     @Column(name = "service_address")
     private String serviceAddress;
-
-    @Column(name = "receiver_name")
+    @Size(max = 150)
+    @Column(name = "receiver_name", length = 150)
     private String receiverName;
-
-    @Column(name = "receiver_phone")
+    @Size(max = 30)
+    @Column(name = "receiver_phone", length = 30)
     private String receiverPhone;
-
-    @Column(name = "planned_start_time")
-    private LocalDateTime plannedStartTime;
-
+    @NotNull
+    @Column(name = "planned_start_time", nullable = false)
+    private Instant plannedStartTime;
     @Column(name = "planned_end_time")
-    private LocalDateTime plannedEndTime;
-
+    private Instant plannedEndTime;
     @Column(name = "actual_start_time")
-    private LocalDateTime actualStartTime;
-
+    private Instant actualStartTime;
     @Column(name = "actual_finish_time")
-    private LocalDateTime actualFinishTime;
-
-    @Column(name = "estimated_km")
+    private Instant actualFinishTime;
+    @Column(name = "estimated_km", precision = 10, scale = 2)
     private BigDecimal estimatedKm;
-
-    @Column(name = "actual_km")
+    @Column(name = "actual_km", precision = 10, scale = 2)
     private BigDecimal actualKm;
-
-    @Column(name = "estimated_hours")
+    @Column(name = "estimated_hours", precision = 6, scale = 2)
     private BigDecimal estimatedHours;
-
-    @Column(name = "actual_hours")
+    @Column(name = "actual_hours", precision = 6, scale = 2)
     private BigDecimal actualHours;
-
+    @Size(max = 20)
+    @NotNull
+    @Column(name = "status", nullable = false, length = 20)
     private String status;
+    @Column(name = "notes", length = Integer.MAX_VALUE)
     private String notes;
-
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
+    private Instant createdAt;
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
+
 }
