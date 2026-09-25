@@ -91,7 +91,7 @@ Koodis on praegu olemas ainult `POST /api/auth/login` ja `GET /api/jobs` (ilma f
 2. **Error infrastruktuur:** errorCode'id on praegu vabad stringid ja 409 käsitlejat pole.
    - Lisada error enum koodidega `INCORRECT_INPUT`, `INCORRECT_CREDENTIALS`, `PRIMARY_KEY_NOT_FOUND`, `ACCESS_DENIED`, `INVALID_STATUS_TRANSITION`, `RESOURCE_IN_USE`, `DUPLICATE_RESOURCE`.
    - Lisada `ConflictException` (409) ja selle handler `RestExceptionHandler`-isse; ForbiddenException (403) kasutada ainult õiguste puudumisel.
-3. **`GET /api/jobs`:** realiseerida query filtrid ja järjestus `plannedStartTime` järgi. `JobListDto` väli `id` → `jobId` (muudab ka `JobsTable.vue`). `JobMapper` võtab praegu kontaktisiku nime, tabel eeldab ettevõtte nime.
+3. **`GET /api/jobs`:** realiseerida query filtrid ja järjestus `plannedStartTime` järgi. `JobDto` väli `id` → `jobId` (muudab ka `JobsTable.vue`). `JobMapper` võtab praegu kontaktisiku nime, tabel eeldab ettevõtte nime.
 4. **Logout:** mudel on stateless JWT, seega backendi logout endpointi ei ole vaja; frontend eemaldab tokeni ja kasutaja andmed ning suunab `/login`. Kui hiljem lisatakse refresh token või HttpOnly cookie, tuleb lisada `POST /api/auth/logout`.
 5. **Failid:** whitelist (kauba foto: image/jpeg, image/png; dokumendid: application/pdf, image/jpeg, image/png), max 10 MB. Backend kontrollib sisu tüüpi ja suurust, mitte ainult laiendit; salvestus kausta `uploads/…` ja serveerimine aadressilt `/uploads/**`.
 6. **Mockupi nupud (tiim muudab kujunduses):**

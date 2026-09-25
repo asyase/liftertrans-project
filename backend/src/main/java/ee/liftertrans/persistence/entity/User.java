@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "`user`")
+@Table(name = "`user`", schema = "liftertrans_project")
 public class User {
     @Id
     @Column(name = "id", nullable = false)

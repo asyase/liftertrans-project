@@ -1,7 +1,7 @@
 package ee.liftertrans.service;
 
 
-import ee.liftertrans.dto.JobListDto;
+import ee.liftertrans.dto.JobDto;
 import ee.liftertrans.persistence.entity.Job;
 import ee.liftertrans.mapper.JobMapper;
 import ee.liftertrans.persistence.repository.JobRepository;
@@ -17,13 +17,13 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
 
-    public List<JobListDto> getJobs() {
+    public List<JobDto> getJobs() {
 
         // Võtame kõik tööd andmebaasist
         List<Job> jobs = jobRepository.findAll();
 
         // Muudame Entity objektid DTO objektideks
-        List<JobListDto> jobDtos = jobMapper.toJobListDtos(jobs);
+        List<JobDto> jobDtos = jobMapper.toJobDtos(jobs);
 
         return jobDtos;
     }

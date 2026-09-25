@@ -1,5 +1,3 @@
-SET search_path TO liftertrans_project;
-
 -- tables
 -- Table: cargo
 CREATE TABLE cargo (

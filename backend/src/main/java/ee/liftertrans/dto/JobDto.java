@@ -4,16 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobListDto {
+public class JobDto {
 
-    private Integer id;
+    private Integer jobId;
 
-    private LocalDateTime plannedStartTime;
+    private Instant plannedStartTime;
 
     private String customerName;
 

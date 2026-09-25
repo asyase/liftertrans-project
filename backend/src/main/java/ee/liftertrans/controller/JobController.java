@@ -1,6 +1,6 @@
 package ee.liftertrans.controller;
 
-import ee.liftertrans.dto.JobListDto;
+import ee.liftertrans.dto.JobDto;
 import ee.liftertrans.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +18,10 @@ public class JobController {
     private final JobService jobService;
 
     @GetMapping("/jobs")
-    public List<JobListDto> getJobs() {
+    public List<JobDto> getJobs() {
 
         // Küsime service'ilt tööde nimekirja
-        List<JobListDto> jobs = jobService.getJobs();
+        List<JobDto> jobs = jobService.getJobs();
 
         return jobs;
     }
