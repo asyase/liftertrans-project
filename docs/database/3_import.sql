@@ -1,22 +1,3 @@
-SET search_path TO liftertrans_project, public;
-BEGIN;
-
--- Clear existing demo/application data so explicit IDs do not collide.
-TRUNCATE TABLE
-    job_status_history,
-    transport_document,
-    job_document,
-    cargo,
-    job,
-    crane_capacity,
-    "user",
-    subcontractor,
-    driver,
-    vehicle,
-    customer,
-    role
-    CASCADE;
-
 -- =========================================================
 -- ROLES
 -- =========================================================
@@ -207,21 +188,32 @@ INSERT INTO "user" (
     email,
     password_hash,
     role_id,
-    driver_id
+    driver_id,
+    status
 ) VALUES
       (
           1,
           'admin@liftertrans.ee',
-          '$2y$10$CudlGKATzPrzH0VZbQig0.2xwD4yZrEJVVckoa0NGXBNuDv3d7ZVK',
+          '123',
           1,
-          NULL
+          NULL,
+       'A'
       ),
       (
           2,
-          'mart.tamm@liftertrans.ee',
-          '$2y$10$uJBIDdSsHp85irrMhfcFGuZ3K3oNZhfHKSEurYUARodvirUeHHxgq',
+          'juht@liftertrans.ee',
+          '123',
           2,
-          1
+          1,
+          'A'
+      ),
+      (
+          3,
+          'mitteaktiivne@liftertrans.ee',
+          '123',
+          2,
+          1,
+          'D'
       );
 
 
@@ -666,4 +658,20 @@ INSERT INTO job_status_history (
       (10, 5, 'DRAFT', 'PLANNED', CURRENT_TIMESTAMP, 'admin@liftertrans.ee', 'Tellimus kinnitatud ja alltöövõtja määratud'),
       (11, 6, 'DRAFT', 'CANCELLED', CURRENT_TIMESTAMP, 'admin@liftertrans.ee', 'Klient tühistas töö');
 
-COMMIT;
+
+-- =========================================================
+-- UPDATE SEQUENCE COUNTERS
+-- =========================================================
+
+SELECT setval(pg_get_serial_sequence('role', 'id'), COALESCE((SELECT MAX(id) FROM role), 1));
+SELECT setval(pg_get_serial_sequence('customer', 'id'), COALESCE((SELECT MAX(id) FROM customer), 1));
+SELECT setval(pg_get_serial_sequence('vehicle', 'id'), COALESCE((SELECT MAX(id) FROM vehicle), 1));
+SELECT setval(pg_get_serial_sequence('crane_capacity', 'id'), COALESCE((SELECT MAX(id) FROM crane_capacity), 1));
+SELECT setval(pg_get_serial_sequence('driver', 'id'), COALESCE((SELECT MAX(id) FROM driver), 1));
+SELECT setval(pg_get_serial_sequence('"user"', 'id'), COALESCE((SELECT MAX(id) FROM "user"), 1));
+SELECT setval(pg_get_serial_sequence('subcontractor', 'id'), COALESCE((SELECT MAX(id) FROM subcontractor), 1));
+SELECT setval(pg_get_serial_sequence('job', 'id'), COALESCE((SELECT MAX(id) FROM job), 1));
+SELECT setval(pg_get_serial_sequence('cargo', 'id'), COALESCE((SELECT MAX(id) FROM cargo), 1));
+SELECT setval(pg_get_serial_sequence('job_document', 'id'), COALESCE((SELECT MAX(id) FROM job_document), 1));
+SELECT setval(pg_get_serial_sequence('transport_document', 'id'), COALESCE((SELECT MAX(id) FROM transport_document), 1));
+SELECT setval(pg_get_serial_sequence('job_status_history', 'id'), COALESCE((SELECT MAX(id) FROM job_status_history), 1));

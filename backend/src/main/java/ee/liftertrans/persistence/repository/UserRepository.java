@@ -8,6 +8,8 @@ import java.util.Optional;
 
 //Repository = koht, kust Service küsib andmebaasi andmeid.
 public interface UserRepository extends JpaRepository<User, Integer> {
-    @Query("select u from User u where u.email = ?1")
-    Optional<User> findByEmail(String email);
+
+    @Query("select u from User u where u.email = :email and u.passwordHash = :passwordHash and u.status = :status")
+    Optional<User> findUserBy(String email, String passwordHash, String status);
+
 }

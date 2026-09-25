@@ -157,6 +157,7 @@ CREATE TABLE "user" (
                         password_hash varchar(255)  NOT NULL,
                         role_id int  NOT NULL,
                         driver_id int  NULL,
+                        status varchar(1)  NOT NULL,
                         CONSTRAINT USER_email_uq UNIQUE (email) NOT DEFERRABLE  INITIALLY IMMEDIATE,
                         CONSTRAINT USER_pk PRIMARY KEY (id)
 );

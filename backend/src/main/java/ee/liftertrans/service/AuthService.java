@@ -20,31 +20,20 @@ public class AuthService {
 
 private final UserRepository userRepository;
 private final UserMapper userMapper;
-private final PasswordEncoder passwordEncoder;
 
 public AuthResponseDto login(AuthRequestDto authRequestDto) {
 
     // 1. Leia kasutaja emaili järgi
     String email = authRequestDto.getEmail();
+    String password = authRequestDto.getPassword();
 
-    User user = userRepository.findByEmail(email)
+    User user = userRepository.findUserBy(email, password, "A")
             .orElseThrow(()-> new UnauthorizedException(
                     "Vale e-post või parool",
                     "INCORRECT_CREDENTIALS"
                     )
             );
 
-    // 2. Kontrolli parooli
-
-    if (!passwordEncoder.matches(
-            authRequestDto.getPassword(),
-            user.getPasswordHash()
-    )) {
-        throw new UnauthorizedException(
-                "Vale e-post või parool",
-                "INCORRECT_CREDENTIALS"
-        );
-    }
 
 
     return userMapper.toAuthResponseDto(user);

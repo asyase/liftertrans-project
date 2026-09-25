@@ -29,6 +29,10 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")
     private Driver driver;
+    @Size(max = 1)
+    @NotNull
+    @Column(name = "status", nullable = false, length = 1)
+    private String status;
 
 
 }

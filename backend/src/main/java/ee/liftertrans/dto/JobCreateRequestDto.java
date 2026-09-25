@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 
@@ -32,9 +32,9 @@ public class JobCreateRequestDto {
     private String receiverPhone;
 
     @NotNull
-    private LocalDateTime plannedStartTime;
+    private Instant plannedStartTime;
 
-    private LocalDateTime plannedEndTime;
+    private Instant plannedEndTime;
 
     private BigDecimal estimatedKm;
     private BigDecimal estimatedHours;
