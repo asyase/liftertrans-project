@@ -1,8 +1,10 @@
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 
 </script>
 
-<template></template>
+<template>
+*
+</template>
 
 <style></style>
