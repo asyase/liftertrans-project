@@ -1,5 +1,7 @@
 <script>
 import JobService from '@/services/JobService.js'
+import CustomerService from '@/services/CustomerService.js'
+import VehicleService from '@/services/VehicleService.js'
 
 export default {
   name: 'JobCreateEditView',
@@ -31,31 +33,43 @@ export default {
 
         notes: '',
       },
-      customers: [
-        {
-          customerId: 1,
-          name: 'Ants Asi',
-          companyName: 'Mida Vaja OÜ',
-        },
-        {
-          customerId: 2,
-          name: 'Mari Mets',
-          companyName: 'Ehitus AS',
-        },
-      ],
       errorMessage: '',
       isLoading: false,
 
       // Täidetakse backendist (beforeMount)
+      customers: [],
       jobTypes: [],
       executionTypes: [],
+      drivers: [],
+      vehicles: [],
     }
   },
   beforeMount() {
+    this.getCustomers()
     this.getJobTypes()
     this.getExecutionTypes()
+    //  this.getDrivers()
+    this.getVehicles()
   },
   methods: {
+    getCustomers() {
+      CustomerService.getCustomersRequest()
+        .then((response) => {
+          this.customers = response.data
+        })
+        .catch(() => {
+          this.errorMessage = 'Klientide laadimine ebaõnnestus'
+        })
+    },
+    getDrivers() {
+      JobService.getDriversRequest()
+        .then((response) => {
+          this.drivers = response.data
+        })
+        .catch(() => {
+          this.errorMessage = 'Juhtide laadimine ebaõnnestus'
+        })
+    },
     getJobTypes() {
       JobService.getJobTypesRequest()
         .then((response) => {
@@ -63,6 +77,15 @@ export default {
         })
         .catch(() => {
           this.errorMessage = 'Töö tüüpide laadimine ebaõnnestus'
+        })
+    },
+    getVehicles() {
+      VehicleService.getVehiclesRequest()
+        .then((response) => {
+          this.vehicles = response.data
+        })
+        .catch(() => {
+          this.errorMessage = 'not ok'
         })
     },
 
@@ -114,7 +137,7 @@ export default {
     <label>Klient</label>
     <select v-model="job.customerId">
       <option :value="null">Vali klient</option>
-      <option v-for="customer in customers" :key="customer.customerId" :value="customer.customerId">
+      <option v-for="customer in customers" :key="customer.id" :value="customer.id">
         {{ customer.companyName }}-{{ customer.name }}
       </option>
     </select>
@@ -142,6 +165,39 @@ export default {
         :value="executionType.value"
       >
         {{ executionType.text }}
+      </option>
+    </select>
+
+    <label>Täitmise tüüp</label>
+
+    <select v-model="job.executionType">
+      <option value="">Vali täitmise tüüp</option>
+      <option
+        v-for="executionType in executionTypes"
+        :key="executionType.value"
+        :value="executionType.value"
+      >
+        {{ executionType.text }}
+      </option>
+    </select>
+
+    <label>Juht</label>
+
+    <select v-model="job.driverId">
+      <option :value="null">Vali juht</option>
+
+      <option v-for="driver in drivers" :key="driver.driverId" :value="driver.driverId">
+        {{ driver.name }}
+      </option>
+    </select>
+
+    <label>Auto</label>
+
+    <select v-model="job.vehicleId">
+      <option :value="null">Vali auto</option>
+
+      <option v-for="vehicle in vehicles" :key="vehicle.vehicleId" :value="vehicle.vehicleId">
+        {{ vehicle.name }}
       </option>
     </select>
 

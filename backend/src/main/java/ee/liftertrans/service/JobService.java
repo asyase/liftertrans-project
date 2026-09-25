@@ -24,6 +24,7 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
     private final DriverService driverService;
+    private final VehicleService vehicleService;
 
 
     public List<JobDto> getJobs() {
@@ -103,8 +104,10 @@ public class JobService {
         // TODO: leia Customer customerId järgi
         // job.setCustomer(customer);
 
-        // TODO: kui vehicleId != null, leia Vehicle
-        // job.setVehicle(vehicle);
+        // Sõiduk (ainult kui on valitud)
+        if (request.getVehicleId() != null) {
+            job.setVehicle(vehicleService.getValidVehicleBy(request.getVehicleId()));
+        }
 
         // Juht (ainult kui on valitud)
         if (request.getDriverId() != null) {

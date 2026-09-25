@@ -8,6 +8,7 @@ import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
 import ee.liftertrans.mapper.JobMapper;
 import ee.liftertrans.persistence.entity.Driver;
 import ee.liftertrans.persistence.entity.Job;
+import ee.liftertrans.persistence.entity.Vehicle;
 import ee.liftertrans.persistence.repository.JobRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,6 +41,9 @@ class JobServiceTest {
     @Mock
     private DriverService driverService;
 
+    @Mock
+    private VehicleService vehicleService;
+
     @InjectMocks
     private JobService jobService;
 
@@ -54,7 +58,7 @@ class JobServiceTest {
         request.setExecutionType("INTERNAL");
         request.setPickupAddress("Tallinn, Pärnu mnt 1");
         request.setDeliveryAddress("Tartu, Riia 2");
-        request.setPlannedStartTime(LocalDateTime.of(2026, 10, 1, 8, 0));
+        request.setPlannedStartTime(Instant.parse("2026-10-01T08:00:00Z"));
         request.setNotes("test");
     }
 
@@ -102,7 +106,7 @@ class JobServiceTest {
         assertEquals("INTERNAL", savedJob.getExecutionType());
         assertEquals("Tallinn, Pärnu mnt 1", savedJob.getPickupAddress());
         assertEquals("Tartu, Riia 2", savedJob.getDeliveryAddress());
-        assertEquals(LocalDateTime.of(2026, 10, 1, 8, 0), savedJob.getPlannedStartTime());
+        assertEquals(Instant.parse("2026-10-01T08:00:00Z"), savedJob.getPlannedStartTime());
         assertEquals("test", savedJob.getNotes());
     }
 
@@ -127,6 +131,37 @@ class JobServiceTest {
     void createJob_driverNotFound_throwsPrimaryKeyNotFound() {
         request.setDriverId(999);
         when(driverService.getValidDriverBy(999)).thenThrow(new PrimaryKeyNotFoundException("driverId", 999));
+
+        PrimaryKeyNotFoundException exception = assertThrows(
+                PrimaryKeyNotFoundException.class,
+                () -> jobService.createJob(request)
+        );
+
+        assertEquals("PRIMARY_KEY_NOT_FOUND", exception.getErrorCode());
+        verify(jobRepository, never()).save(any(Job.class));
+    }
+
+    // ===== Sõiduk =====
+
+    @Test
+    void createJob_withExistingVehicle_setsVehicleOnJob() {
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(2);
+        request.setVehicleId(2);
+        when(vehicleService.getValidVehicleBy(2)).thenReturn(vehicle);
+        when(jobRepository.save(any(Job.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        jobService.createJob(request);
+
+        ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+        verify(jobRepository).save(jobCaptor.capture());
+        assertSame(vehicle, jobCaptor.getValue().getVehicle());
+    }
+
+    @Test
+    void createJob_vehicleNotFound_throwsPrimaryKeyNotFound() {
+        request.setVehicleId(999);
+        when(vehicleService.getValidVehicleBy(999)).thenThrow(new PrimaryKeyNotFoundException("vehicleId", 999));
 
         PrimaryKeyNotFoundException exception = assertThrows(
                 PrimaryKeyNotFoundException.class,
