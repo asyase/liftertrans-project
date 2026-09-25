@@ -23,54 +23,56 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 
 public class AuthController {
+
     private final AuthService authService;
-@PostMapping("/api/auth/login")
-@Operation(
-        summary="Sisse logimine.Tagastab userId, email, roleName ja driverId"
-)
+
+    @PostMapping("/api/auth/login")
+    @Operation(
+            summary = "Sisse logimine.Tagastab userId, email, roleName ja driverId"
+    )
 
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode="200",
-                    description= "OK"
+                    responseCode = "200",
+                    description = "OK"
             ),
             @ApiResponse(
-                    responseCode="400",
-                    description= "Vigased siseandmed",
-                    content = @Content( schema = @Schema(implementation = ApiError.class),
+                    responseCode = "400",
+                    description = "Vigased siseandmed",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
                             examples = @ExampleObject(
                                     name = "error",
                                     value = """
-                                {
-                                  "message": "email: ei tohi olla tühi",
-                                  "errorCode": "INCORRECT_INPUT"
-                                }
-                                """
+                                            {
+                                              "message": "email: ei tohi olla tühi",
+                                              "errorCode": "INCORRECT_INPUT"
+                                            }
+                                            """
                             )
                     )
 
             ),
 
-    @ApiResponse(
-            responseCode="401",
-            description= "Vale e-post või parool",
-            content = @Content( schema = @Schema(implementation = ApiError.class),
-                    examples = @ExampleObject(
-                            name = "INCORRECT_CREDENTIALS",
-                            value = """
-                                {
-                                  "message": "Vale e-post või parool",
-                                  "errorCode": "INCORRECT_CREDENTIALS"
-                                }
-                                """
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Vale e-post või parool",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "INCORRECT_CREDENTIALS",
+                                    value = """
+                                            {
+                                              "message": "Vale e-post või parool",
+                                              "errorCode": "INCORRECT_CREDENTIALS"
+                                            }
+                                            """
+                            )
                     )
+
             )
 
-    )
-
-            })
-    public AuthResponseDto login(@RequestBody @Valid AuthRequestDto authRequestDto)  {
-    return authService.login(authRequestDto);
+    })
+    public AuthResponseDto login(@RequestBody @Valid AuthRequestDto authRequestDto) {
+        return authService.login(authRequestDto);
 
 
     }

@@ -1,24 +1,24 @@
 package ee.liftertrans.controller;
 
-import ee.liftertrans.dto.CustomerListDto;
+import ee.liftertrans.dto.CustomerDto;
 import ee.liftertrans.service.CustomerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
-
 public class CustomerController {
     private final CustomerService customerService;
 
 
     @GetMapping
-    public List<CustomerListDto> getCustomers(@RequestParam(required = false)String search){
+    public List<CustomerDto> getCustomers(@RequestParam(required = false) String search) {
         return customerService.getCustomers(search);
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-  INVALID_SEARCH_PARAMETER(HttpStatus.BAD_REQUEST, "Otsingu parameeter on vigane"),
+  INVALID_SEARCH_PARAMETER(HttpStatus.BAD_REQUEST, "Otsingu parameeter on pikem kui 100 tähemärki"),
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Kasutaja ei ole sisse logitud"),
   ACCESS_DENIED(HttpStatus.FORBIDDEN, "Kasutajal puudub ligipääs");
 

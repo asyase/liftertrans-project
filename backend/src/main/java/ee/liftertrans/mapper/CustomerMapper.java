@@ -1,6 +1,6 @@
 package ee.liftertrans.mapper;
 
-import ee.liftertrans.dto.CustomerListDto;
+import ee.liftertrans.dto.CustomerDto;
 import ee.liftertrans.persistence.entity.Customer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,7 +23,7 @@ public interface CustomerMapper {
     @Mapping(source = "invoiceEmail", target = "invoiceEmail")
     @Mapping(source = "phone", target = "phone")
 
-    CustomerListDto toCustomerDto(Customer customer);
+    CustomerDto toCustomerDto(Customer customer);
 
-    List<CustomerListDto> toCustomerDtos(List<Customer> customers);
+    List<CustomerDto> toCustomerDtos(List<Customer> customers);
 }
