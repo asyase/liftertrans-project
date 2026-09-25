@@ -6,15 +6,10 @@ import ee.liftertrans.dto.JobListDto;
 import ee.liftertrans.dto.SelectOptionDto;
 import ee.liftertrans.infrastructure.exception.IncorrectInputException;
 import ee.liftertrans.mapper.JobMapper;
-import ee.liftertrans.persistence.entity.Customer;
-import ee.liftertrans.persistence.entity.Driver;
 import ee.liftertrans.persistence.entity.Job;
-import ee.liftertrans.persistence.entity.Subcontractor;
-import ee.liftertrans.persistence.entity.Vehicle;
 import ee.liftertrans.persistence.enums.ExecutionType;
 import ee.liftertrans.persistence.enums.JobType;
 import ee.liftertrans.persistence.repository.JobRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +23,7 @@ public class JobService {
 
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
-    private final EntityManager entityManager; // TEMP: testimiseks, kustutada
+    private final DriverService driverService;
 
 
     public List<JobListDto> getJobs() {
@@ -104,24 +99,6 @@ public class JobService {
         // Uus töö luuakse DRAFT staatuses
         job.setStatus("DRAFT");
 
-        // ===== TEMP: testimiseks, kustutada kui päris lahendus olemas =====
-        // id: järgmine vaba (asendub @GeneratedValue / IDENTITY-ga)
-        int nextJobId = jobRepository.findAll().stream().mapToInt(Job::getId).max().orElse(0) + 1;
-        job.setId(nextJobId);
-
-        // Seosed: viide ID järgi (asenduvad allolevate TODO-dega)
-        job.setCustomer(entityManager.getReference(Customer.class, request.getCustomerId()));
-        if (request.getVehicleId() != null) {
-            job.setVehicle(entityManager.getReference(Vehicle.class, request.getVehicleId()));
-        }
-        if (request.getDriverId() != null) {
-            job.setDriver(entityManager.getReference(Driver.class, request.getDriverId()));
-        }
-        if (request.getSubcontractorId() != null) {
-            job.setSubcontractor(entityManager.getReference(Subcontractor.class, request.getSubcontractorId()));
-        }
-        // ===== TEMP lõpp =====
-
 
         // TODO: leia Customer customerId järgi
         // job.setCustomer(customer);
@@ -129,8 +106,10 @@ public class JobService {
         // TODO: kui vehicleId != null, leia Vehicle
         // job.setVehicle(vehicle);
 
-        // TODO: kui driverId != null, leia Driver
-        // job.setDriver(driver);
+        // Juht (ainult kui on valitud)
+        if (request.getDriverId() != null) {
+            job.setDriver(driverService.getValidDriverBy(request.getDriverId()));
+        }
 
         // TODO: kui subcontractorId != null, leia Subcontractor
         // job.setSubcontractor(subcontractor);

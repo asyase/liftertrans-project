@@ -4,10 +4,11 @@ import ee.liftertrans.dto.JobCreateRequestDto;
 import ee.liftertrans.dto.JobCreateResponseDto;
 import ee.liftertrans.dto.SelectOptionDto;
 import ee.liftertrans.infrastructure.exception.IncorrectInputException;
+import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
 import ee.liftertrans.mapper.JobMapper;
+import ee.liftertrans.persistence.entity.Driver;
 import ee.liftertrans.persistence.entity.Job;
 import ee.liftertrans.persistence.repository.JobRepository;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +38,7 @@ class JobServiceTest {
     private JobMapper jobMapper;
 
     @Mock
-    private EntityManager entityManager;
+    private DriverService driverService;
 
     @InjectMocks
     private JobService jobService;
@@ -103,6 +104,37 @@ class JobServiceTest {
         assertEquals("Tartu, Riia 2", savedJob.getDeliveryAddress());
         assertEquals(LocalDateTime.of(2026, 10, 1, 8, 0), savedJob.getPlannedStartTime());
         assertEquals("test", savedJob.getNotes());
+    }
+
+    // ===== Juht =====
+
+    @Test
+    void createJob_withExistingDriver_setsDriverOnJob() {
+        Driver driver = new Driver();
+        driver.setId(3);
+        request.setDriverId(3);
+        when(driverService.getValidDriverBy(3)).thenReturn(driver);
+        when(jobRepository.save(any(Job.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        jobService.createJob(request);
+
+        ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+        verify(jobRepository).save(jobCaptor.capture());
+        assertSame(driver, jobCaptor.getValue().getDriver());
+    }
+
+    @Test
+    void createJob_driverNotFound_throwsPrimaryKeyNotFound() {
+        request.setDriverId(999);
+        when(driverService.getValidDriverBy(999)).thenThrow(new PrimaryKeyNotFoundException("driverId", 999));
+
+        PrimaryKeyNotFoundException exception = assertThrows(
+                PrimaryKeyNotFoundException.class,
+                () -> jobService.createJob(request)
+        );
+
+        assertEquals("PRIMARY_KEY_NOT_FOUND", exception.getErrorCode());
+        verify(jobRepository, never()).save(any(Job.class));
     }
 
     // ===== Töö tüüp =====
