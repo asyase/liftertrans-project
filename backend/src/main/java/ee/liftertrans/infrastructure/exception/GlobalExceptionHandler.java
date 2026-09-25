@@ -1,0 +1,18 @@
+package ee.liftertrans.infrastructure.exception;
+
+import ee.liftertrans.dto.ErrorResponseDto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponseDto> handleBusinessException(BusinessException ex) {
+    ErrorCode errorCode = ex.getErrorCode();
+
+    return ResponseEntity
+            .status(errorCode.getStatus())
+            .body(new ErrorResponseDto(errorCode.name(), errorCode.getMessage()));
+    }
+}
