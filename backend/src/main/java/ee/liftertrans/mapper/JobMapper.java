@@ -29,6 +29,6 @@ public interface JobMapper {
     @Mapping(source = "id", target = "jobId")
     JobCreateResponseDto toJobCreateResponseDto(Job job);
 
-    List<JobListDto> toJobListDtos(List<Job> jobs);
+    List<JobDto> toJobListDtos(List<Job> jobs);
 
 }
