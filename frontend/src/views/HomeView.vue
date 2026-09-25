@@ -7,10 +7,9 @@
 
 <script>
 
-import TestComponent from "@/components/TestComponent.vue";
 
 export default {
   name: 'HomeView',
-  components: {TestComponent},
+  components: {},
 }
 </script>

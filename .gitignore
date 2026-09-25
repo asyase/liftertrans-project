@@ -1,4 +1,10 @@
 /.idea/
 /.claude/settings.local.json
+/.gradle/
+/build/
+/docs/backend/caches/
+/docs/backend/daemon/
+/docs/backend/native/
+/docs/backend/wrapper/
 .DS_Store
 **/.DS_Store

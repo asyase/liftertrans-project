@@ -3,7 +3,9 @@ package ee.liftertrans.infrastructure;
 import ee.liftertrans.infrastructure.error.ApiError;
 import ee.liftertrans.infrastructure.exception.DataNotFoundException;
 import ee.liftertrans.infrastructure.exception.ForbiddenException;
+import ee.liftertrans.infrastructure.exception.IncorrectInputException;
 import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
+import ee.liftertrans.infrastructure.exception.UnauthorizedException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -26,6 +28,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<ApiError> handleUnauthorizedException(
+            UnauthorizedException exception
+    ) {
+        ApiError apiError = new ApiError();
+        apiError.setMessage(exception.getMessage());
+        apiError.setErrorCode(exception.getErrorCode());
+
+        return new ResponseEntity<>(
+                apiError,
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+
+
+    @ExceptionHandler
     public ResponseEntity<ApiError> handleDataNotFoundException(DataNotFoundException exception) {
         ApiError apiError = new ApiError();
         apiError.setMessage(exception.getMessage());
@@ -33,6 +51,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }
 
+
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleIncorrectInputException(IncorrectInputException exception) {
+        ApiError apiError = new ApiError();
+        apiError.setMessage(exception.getMessage());
+        apiError.setErrorCode(exception.getErrorCode());
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler
     public ResponseEntity<ApiError> handlePrimaryKeyNotFoundException(PrimaryKeyNotFoundException exception) {
