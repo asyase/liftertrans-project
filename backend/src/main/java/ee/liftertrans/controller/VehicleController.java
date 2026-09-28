@@ -16,6 +16,7 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
 
+    // Tagastab kõik autod ilma filtrita — tellimuse vormis filtreerib frontend (filteredVehicles)
     @GetMapping("/vehicles")
     public List<VehicleDto> getAllVehicles() {
         return vehicleService.getAllVehicles();

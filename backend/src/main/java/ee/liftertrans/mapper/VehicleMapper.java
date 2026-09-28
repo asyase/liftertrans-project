@@ -12,6 +12,8 @@ import java.util.List;
 public interface VehicleMapper {
 
     @Mapping(source = "id", target = "vehicleId")
+    // Võtame seotud Subcontractor entity id; oma auto puhul on subcontractor null → subcontractorId null
+    @Mapping(source = "subcontractor.id", target = "subcontractorId")
     VehicleDto toVehicleDto(Vehicle vehicle);
 
     List<VehicleDto> toVehicleDtos(List<Vehicle> vehicles);

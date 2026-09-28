@@ -6,14 +6,42 @@ import DriverService from '@/services/DriverService.js'
 
 export default {
   name: 'JobCreateEditView',
-  computed: {},
+  computed: {
+    filteredVehicles() {
+      // Tellimusele saab valida ainult kasutuses oleva auto (mitte nt IN_SERVICE)
+      const activeVehicles = this.vehicles.filter((vehicle) => vehicle.status === 'ACTIVE')
+
+      // Oma ressursiga: ainult oma autod (alltöövõtjat pole)
+      if (this.job.executionType === 'INTERNAL') {
+        return activeVehicles.filter((vehicle) => vehicle.subcontractorId === null)
+      }
+
+      // Alltöövõtja: ainult valitud alltöövõtja autod (kuni alltöövõtja pole valitud, pole ka autosid)
+      if (this.job.subcontractorId === null) {
+        return []
+      }
+      return activeVehicles.filter(
+        (vehicle) => vehicle.subcontractorId === this.job.subcontractorId,
+      )
+    },
+  },
+
+  watch: {
+    // Teostamise viisi vahetamisel tühjendame eelmise viisi valikud,
+    // muidu jääks nt peidetud juht alles ja backend lükkaks töö tagasi
+    'job.executionType'() {
+      this.job.driverId = null
+      this.job.vehicleId = null
+      this.job.subcontractorId = null
+    },
+  },
 
   data() {
     return {
       job: {
         customerId: null,
         jobType: '',
-        executionType: '',
+        executionType: 'INTERNAL',
 
         vehicleId: null,
         driverId: null,
@@ -86,7 +114,7 @@ export default {
           this.vehicles = response.data
         })
         .catch(() => {
-          this.errorMessage = 'not ok'
+          this.errorMessage = 'Autode laadimine ebaõnnestus'
         })
     },
 
@@ -107,8 +135,15 @@ export default {
       // Alustame laadimist
       this.isLoading = true
 
-      // vaja saata this.job backi
-      JobService.postJobRequest(this.job)
+      // Backend ootab aegu Instant-ina (ISO, nt "2026-09-28T07:00:00.000Z"),
+      // datetime-local annab aga ajavööndita "2026-09-28T10:00"
+      const jobRequest = {
+        ...this.job,
+        plannedStartTime: this.toIsoString(this.job.plannedStartTime),
+        plannedEndTime: this.toIsoString(this.job.plannedEndTime),
+      }
+
+      JobService.postJobRequest(jobRequest)
         .then((response) => {
           const jobId = response.data.jobId
 
@@ -120,6 +155,14 @@ export default {
         .finally(() => {
           this.isLoading = false
         })
+    },
+
+    toIsoString(dateTimeLocal) {
+      // Tühi väli → null (backend annab plannedStartTime puhul selge veateate)
+      if (!dateTimeLocal) {
+        return null
+      }
+      return new Date(dateTimeLocal).toISOString()
     },
   },
 }
@@ -157,50 +200,78 @@ export default {
     </select>
 
     <label>Täitmise tüüp</label>
-
-    <select v-model="job.executionType">
-      <option value="">Vali täitmise tüüp</option>
-      <option
-        v-for="executionType in executionTypes"
-        :key="executionType.value"
+    <!-- VIGA OLI: div-i sees ei olnud midagi (<div ...></div>), "input" ja type="radio" olid
+         kirjutatud div-i atribuutideks. Raadionupp on eraldi <input /> tag div-i SEES. -->
+    <!-- VIGA OLI: :value oli div-il, aga see peab olema input-il (div-il pole väärtust). -->
+    <div
+      v-for="executionType in executionTypes"
+      :key="executionType.value"
+      class="form-check form-check-inline"
+    >
+      <!-- v-model on kõigil nuppudel sama → Vue teab, et need on üks grupp (valida saab ühe) -->
+      <!-- VIGA OLI: v-model="job.executionType" puudus nupul, seega valik ei jõudnud job-i -->
+      <input
+        type="radio"
+        class="form-check-input"
+        :id="executionType.value"
         :value="executionType.value"
-      >
+        v-model="job.executionType"
+      />
+      <label class="form-check-label" :for="executionType.value">
         {{ executionType.text }}
-      </option>
-    </select>
+      </label>
+    </div>
 
-    <label>Täitmise tüüp</label>
+    <div v-if="job.executionType === 'INTERNAL'">
+      <label>Juht</label>
 
-    <select v-model="job.executionType">
-      <option value="">Vali täitmise tüüp</option>
-      <option
-        v-for="executionType in executionTypes"
-        :key="executionType.value"
-        :value="executionType.value"
-      >
-        {{ executionType.text }}
-      </option>
-    </select>
-
-    <label>Juht</label>
-
-    <select v-model="job.driverId">
-      <option :value="null">Vali juht</option>
-
-      <option v-for="driver in drivers" :key="driver.driverId" :value="driver.driverId">
-        {{ driver.name }}
-      </option>
-    </select>
+      <select v-model="job.driverId">
+        <option :value="null">Vali juht</option>
+        <option v-for="driver in drivers" :key="driver.driverId" :value="driver.driverId">
+          {{ driver.name }}
+        </option>
+      </select>
+    </div>
 
     <label>Auto</label>
 
     <select v-model="job.vehicleId">
       <option :value="null">Vali auto</option>
 
-      <option v-for="vehicle in vehicles" :key="vehicle.vehicleId" :value="vehicle.vehicleId">
-        {{ vehicle.name }}
+      <!-- filteredVehicles, mitte vehicles: näitame ainult valitud teostamise viisile sobivaid autosid -->
+      <option
+        v-for="vehicle in filteredVehicles"
+        :key="vehicle.vehicleId"
+        :value="vehicle.vehicleId"
+      >
+        {{ vehicle.registrationNumber }} ({{ vehicle.name }})
       </option>
     </select>
+
+    <h3>3. Aadressid</h3>
+
+    <!-- CRANE_ONLY → ainult töö aadress -->
+    <div v-if="job.jobType === 'CRANE_ONLY'">
+      <label>Töö aadress</label>
+      <input v-model="job.serviceAddress" type="text" />
+    </div>
+
+    <!-- TRANSPORT_AND_CRANE → pealevõtu ja kohaletoimetamise aadress -->
+    <div v-if="job.jobType === 'TRANSPORT_AND_CRANE'">
+      <label>Pealevõtu aadress</label>
+      <input v-model="job.pickupAddress" type="text" />
+
+      <label>Kohaletoimetamise aadress</label>
+      <input v-model="job.deliveryAddress" type="text" />
+    </div>
+
+    <h3>4. Aeg</h3>
+
+    <label>Planeeritud algus</label>
+    <input v-model="job.plannedStartTime" type="datetime-local" />
+
+    <label>Planeeritud lõpp</label>
+    <input v-model="job.plannedEndTime" type="datetime-local" />
 
     <button @click="createJob" :disabled="isLoading" class="btn btn-success">Salvesta</button>
 
