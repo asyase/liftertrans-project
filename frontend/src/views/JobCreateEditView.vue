@@ -2,6 +2,7 @@
 import JobService from '@/services/JobService.js'
 import CustomerService from '@/services/CustomerService.js'
 import VehicleService from '@/services/VehicleService.js'
+import DriverService from '@/services/DriverService.js'
 
 export default {
   name: 'JobCreateEditView',
@@ -48,7 +49,7 @@ export default {
     this.getCustomers()
     this.getJobTypes()
     this.getExecutionTypes()
-    //  this.getDrivers()
+    this.getDrivers()
     this.getVehicles()
   },
   methods: {
@@ -62,7 +63,7 @@ export default {
         })
     },
     getDrivers() {
-      JobService.getDriversRequest()
+      DriverService.getDriversRequest()
         .then((response) => {
           this.drivers = response.data
         })
