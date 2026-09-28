@@ -168,113 +168,177 @@ export default {
 }
 </script>
 <template>
-  <div class="container">
-    <h1>Lisa uus tellimus</h1>
+  <div class="container pb-5" style="max-width: 960px">
+    <h1 class="mb-4">Lisa uus tellimus</h1>
 
     <!-- Veateade -->
-    <div v-if="errorMessage">
+    <div v-if="errorMessage" class="alert alert-danger" role="alert">
       {{ errorMessage }}
     </div>
 
-    <h3>1. Klient</h3>
+    <div class="card lt-section mb-3">
+      <div class="card-body">
+        <h3 class="card-title mb-3">1. Klient</h3>
 
-    <label>Klient</label>
-    <select v-model="job.customerId">
-      <option :value="null">Vali klient</option>
-      <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-        {{ customer.companyName }}-{{ customer.name }}
-      </option>
-    </select>
-    <label>Vastuvõtja nimi</label>
-    <input v-model="job.receiverName" type="text" />
+        <div class="row g-3">
+          <div class="col-12">
+            <label for="customerId" class="form-label">Klient</label>
+            <select id="customerId" v-model="job.customerId" class="form-select">
+              <option :value="null">Vali klient</option>
+              <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+                {{ customer.companyName }}-{{ customer.name }}
+              </option>
+            </select>
+          </div>
 
-    <label>Vastuvõtja telefon</label>
-    <input v-model="job.receiverPhone" type="tel" />
+          <div class="col-md-6">
+            <label for="receiverName" class="form-label">Vastuvõtja nimi</label>
+            <input id="receiverName" v-model="job.receiverName" type="text" class="form-control" />
+          </div>
 
-    <h3>2. Töö</h3>
-    <select v-model="job.jobType">
-      <option value="">Vali töö tüüp</option>
-      <option v-for="jobType in jobTypes" :key="jobType.value" :value="jobType.value">
-        {{ jobType.text }}
-      </option>
-    </select>
-
-    <label>Täitmise tüüp</label>
-    <!-- VIGA OLI: div-i sees ei olnud midagi (<div ...></div>), "input" ja type="radio" olid
-         kirjutatud div-i atribuutideks. Raadionupp on eraldi <input /> tag div-i SEES. -->
-    <!-- VIGA OLI: :value oli div-il, aga see peab olema input-il (div-il pole väärtust). -->
-    <div
-      v-for="executionType in executionTypes"
-      :key="executionType.value"
-      class="form-check form-check-inline"
-    >
-      <!-- v-model on kõigil nuppudel sama → Vue teab, et need on üks grupp (valida saab ühe) -->
-      <!-- VIGA OLI: v-model="job.executionType" puudus nupul, seega valik ei jõudnud job-i -->
-      <input
-        type="radio"
-        class="form-check-input"
-        :id="executionType.value"
-        :value="executionType.value"
-        v-model="job.executionType"
-      />
-      <label class="form-check-label" :for="executionType.value">
-        {{ executionType.text }}
-      </label>
+          <div class="col-md-6">
+            <label for="receiverPhone" class="form-label">Vastuvõtja telefon</label>
+            <input id="receiverPhone" v-model="job.receiverPhone" type="tel" class="form-control" />
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div v-if="job.executionType === 'INTERNAL'">
-      <label>Juht</label>
+    <div class="card lt-section mb-3">
+      <div class="card-body">
+        <h3 class="card-title mb-3">2. Töö</h3>
 
-      <select v-model="job.driverId">
-        <option :value="null">Vali juht</option>
-        <option v-for="driver in drivers" :key="driver.driverId" :value="driver.driverId">
-          {{ driver.name }}
-        </option>
-      </select>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="jobType" class="form-label">Töö tüüp</label>
+            <select id="jobType" v-model="job.jobType" class="form-select">
+              <option value="">Vali töö tüüp</option>
+              <option v-for="jobType in jobTypes" :key="jobType.value" :value="jobType.value">
+                {{ jobType.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label d-block">Täitmise tüüp</label>
+            <div
+              v-for="executionType in executionTypes"
+              :key="executionType.value"
+              class="form-check form-check-inline mt-2">
+
+              <input
+                type="radio"
+                class="form-check-input"
+                :id="executionType.value"
+                :value="executionType.value"
+                v-model="job.executionType"
+              />
+              <label class="form-check-label" :for="executionType.value">
+                {{ executionType.text }}
+              </label>
+            </div>
+          </div>
+
+          <div v-if="job.executionType === 'INTERNAL'" class="col-md-6">
+            <label for="driverId" class="form-label">Juht</label>
+            <select id="driverId" v-model="job.driverId" class="form-select">
+              <option :value="null">Vali juht</option>
+              <option v-for="driver in drivers" :key="driver.driverId" :value="driver.driverId">
+                {{ driver.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="vehicleId" class="form-label">Auto</label>
+            <select id="vehicleId" v-model="job.vehicleId" class="form-select">
+              <option :value="null">Vali auto</option>
+              <option
+                v-for="vehicle in filteredVehicles"
+                :key="vehicle.vehicleId"
+                :value="vehicle.vehicleId"
+              >
+                {{ vehicle.registrationNumber }} ({{ vehicle.name }})
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <label>Auto</label>
+    <div class="card lt-section mb-3">
+      <div class="card-body">
+        <h3 class="card-title mb-3">3. Aadressid</h3>
 
-    <select v-model="job.vehicleId">
-      <option :value="null">Vali auto</option>
+        <p v-if="!job.jobType" class="text-body-secondary mb-0">Vali esmalt töö tüüp.</p>
 
-      <!-- filteredVehicles, mitte vehicles: näitame ainult valitud teostamise viisile sobivaid autosid -->
-      <option
-        v-for="vehicle in filteredVehicles"
-        :key="vehicle.vehicleId"
-        :value="vehicle.vehicleId"
-      >
-        {{ vehicle.registrationNumber }} ({{ vehicle.name }})
-      </option>
-    </select>
+        <!-- CRANE_ONLY → ainult töö aadress -->
+        <div v-if="job.jobType === 'CRANE_ONLY'">
+          <label for="serviceAddress" class="form-label">Töö aadress</label>
+          <input
+            id="serviceAddress"
+            v-model="job.serviceAddress"
+            type="text"
+            class="form-control"
+          />
+        </div>
 
-    <h3>3. Aadressid</h3>
-
-    <!-- CRANE_ONLY → ainult töö aadress -->
-    <div v-if="job.jobType === 'CRANE_ONLY'">
-      <label>Töö aadress</label>
-      <input v-model="job.serviceAddress" type="text" />
+        <!-- TRANSPORT_AND_CRANE → pealevõtu ja kohaletoimetamise aadress -->
+        <div v-if="job.jobType === 'TRANSPORT_AND_CRANE'" class="row g-3">
+          <div class="col-md-6">
+            <label for="pickupAddress" class="form-label">Pealevõtu aadress</label>
+            <input
+              id="pickupAddress"
+              v-model="job.pickupAddress"
+              type="text"
+              class="form-control"
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="deliveryAddress" class="form-label">Kohaletoimetamise aadress</label>
+            <input
+              id="deliveryAddress"
+              v-model="job.deliveryAddress"
+              type="text"
+              class="form-control"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- TRANSPORT_AND_CRANE → pealevõtu ja kohaletoimetamise aadress -->
-    <div v-if="job.jobType === 'TRANSPORT_AND_CRANE'">
-      <label>Pealevõtu aadress</label>
-      <input v-model="job.pickupAddress" type="text" />
+    <div class="card lt-section mb-4">
+      <div class="card-body">
+        <h3 class="card-title mb-3">4. Aeg</h3>
 
-      <label>Kohaletoimetamise aadress</label>
-      <input v-model="job.deliveryAddress" type="text" />
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="plannedStartTime" class="form-label">Planeeritud algus</label>
+            <input
+              id="plannedStartTime"
+              v-model="job.plannedStartTime"
+              type="datetime-local"
+              class="form-control"
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="plannedEndTime" class="form-label">Planeeritud lõpp</label>
+            <input
+              id="plannedEndTime"
+              v-model="job.plannedEndTime"
+              type="datetime-local"
+              class="form-control"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h3>4. Aeg</h3>
-
-    <label>Planeeritud algus</label>
-    <input v-model="job.plannedStartTime" type="datetime-local" />
-
-    <label>Planeeritud lõpp</label>
-    <input v-model="job.plannedEndTime" type="datetime-local" />
-
-    <button @click="createJob" :disabled="isLoading" class="btn btn-success">Salvesta</button>
-
-    <button class="btn btn-secondary">Tühista</button>
+    <div class="d-flex gap-2 justify-content-end">
+      <button class="btn btn-outline-secondary">Tühista</button>
+      <button @click="createJob" :disabled="isLoading" class="btn btn-primary px-4">
+        Salvesta
+      </button>
+    </div>
   </div>
 </template>
