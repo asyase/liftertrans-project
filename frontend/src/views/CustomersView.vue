@@ -1,50 +1,126 @@
 <script>
-
-import { ref, onMounted } from 'vue'
-// import { useRouter } from 'vue-router'
-import axios from 'axios' // 1. Impordi axios
-
-// const router = useRouter()
-const customers = ref([])
-const searchQuery = ref('')
+import axios from 'axios'
+import CustomerService from '@/services/CustomerService.js'
 
 export default {
-  name: 'CustomerView'
-}
+  name: 'CustomersView',
 
-const fetchCustomers = async () => {
-  try {
-    const response = await axios.get('/api/customers', {
-      params: searchQuery.value ? { search: searchQuery.value } : {},
-    })
+  beforeMount() {
+    this.getCustomers()
+  },
+  data() {
+    return {
+      customers: [],
+      searchText: '',
 
-    customers.value = response.data
-  } catch (error) {
-    console.error('Viga klientide laadimisel:', error)
-  }
-}
+      errorMessage: '',
 
-// Kustutamise kinnitamine ja API teostus
-/* const confirmDelete = async (customer) => {
-  if (confirm(`Kas oled kindel, et soovid kliendi "${customer.name}" kustutada?`)) {
-    try {
-      await axios.delete(`/api/customers/${customer.customerId}`)
-      // Värskenda nimekirja pärast edukat kustutamist
-      fetchCustomers()
-    } catch (error) {
-      // Axiose vea vastus asub error.response sees
-      if (error.response) {
-        alert(`Viga kustutamisel: ${error.response.data.message}`)
-      } else {
-        console.error('Viga kustutamisel:', error)
-      }
+      errorResponse: {
+        message: '',
+        errorCode: '',
+      },
     }
-  }
-}*/
+  },
 
-onMounted(() => {
-  fetchCustomers()
-})
+  computed: {
+    filteredCustomers() {
+      if (!this.searchText) {
+        return this.customers
+      }
+
+      const search = this.searchText.trim().toLowerCase()
+      return this.customers.filter(
+        (customer) => customer.companyName && customer.companyName.toLowerCase().includes(search),
+      )
+    },
+  },
+
+  methods: {
+    getCustomers() {
+      CustomerService.getCustomersRequest()
+
+        .then((response) => this.handleGetCustomers(response))
+        .catch((error) => this.handleGetCustomersErrorResponse(error))
+    },
+
+    handleGetCustomers(response) {
+      this.customers = response.data
+      console.log('Kliendid', this.customers)
+    },
+
+    handleGetCustomersErrorResponse(error) {
+      this.errorMessage = 'Klientide laadimine ebaõnnestus.'
+    },
+
+    goToAddCustomer() {
+      this.$router.push('/customers/new')
+    },
+
+    goToViewCustomer(customerId) {
+      this.$router.push('/customers/' + customerId)
+    },
+
+    goToEditCustomer(customerId) {
+      this.$router.push('/customers/' + customerId + '/edit')
+    },
+
+    deleteCustomer(customerId) {
+      // kinnitusaken
+      if (confirm('Kas oled kindel, et soovid selle kliendi kustutada?')) {
+        // saadame backendile kustutamise päringu
+        axios
+          .delete('/api/customers/' + customerId)
+          .then(() => {this.getCustomers()})                // värskendame tabelit
+          .catch((error) => {
+            console.error('Kustutamise viga:', error)
+            this.errorMessage = 'Kustutamine ebaõnnestus'
+          })
+      }
+    },
+  },
+}
+//
+// import { ref, onMounted } from 'vue'
+// import data from 'bootstrap/js/src/dom/data.js'
+// // import { useRouter } from 'vue-router'
+//
+// // const router = useRouter()
+// const customers = ref([])
+// const searchQuery = ref('')
+//
+// const fetchCustomers = async () => {
+//   try {
+//     const response = await axios.get('/api/customers', {
+//       params: searchQuery.value ? { search: searchQuery.value } : {},
+//     })
+//
+//     customers.value = response.data
+//   } catch (error) {
+//     console.error('Viga klientide laadimisel:', error)
+//   }
+// }
+//
+// // Kustutamise kinnitamine ja API teostus
+// /* const confirmDelete = async (customer) => {
+//   if (confirm(`Kas oled kindel, et soovid kliendi "${customer.name}" kustutada?`)) {
+//     try {
+//       await axios.delete(`/api/customers/${customer.customerId}`)
+//       // Värskenda nimekirja pärast edukat kustutamist
+//       fetchCustomers()
+//     } catch (error) {
+//       // Axiose vea vastus asub error.response sees
+//       if (error.response) {
+//         alert(`Viga kustutamisel: ${error.response.data.message}`)
+//       } else {
+//         console.error('Viga kustutamisel:', error)
+//       }
+//     }
+//   }
+// }*/
+//
+// onMounted(() => {
+//   fetchCustomers()
+// })
 </script>
 
 <template>
@@ -198,7 +274,8 @@ table {
   text-align: left;
 }
 
-th, td {
+th,
+td {
   border: 1px solid #ccc;
   padding: 8px 12px;
   font-size: 14px;
@@ -208,7 +285,8 @@ th {
   background-color: #f9f9f9;
 }
 
-.actions-cell a, .btn-link {
+.actions-cell a,
+.btn-link {
   margin-right: 8px;
   color: #0066cc;
   text-decoration: underline;
