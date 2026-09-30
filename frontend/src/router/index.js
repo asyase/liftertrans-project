@@ -6,6 +6,7 @@ import LoginView from '@/views/LoginView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import MyJobsView from '@/views/MyJobsView.vue'
 import JobCreateEditView from '@/views/JobCreateEditView.vue'
+import JobDetailView from '@/views/JobDetailView.vue'
 import DriversView from '@/views/DriversView.vue'
 import DriverCreateEditView from '@/views/DriverCreateEditView.vue'
 import DriverDetailView from '@/views/DriverDetailView.vue'
@@ -59,6 +60,13 @@ const router = createRouter({
       path: '/jobs/new',
       name: 'job-create',
       component: JobCreateEditView,
+    },
+
+    // Ühe töö detailvaade, :id = töö ID (/jobs/new on täpsem rada, see läheb ette)
+    {
+      path: '/jobs/:id',
+      name: 'job-detail',
+      component: JobDetailView,
     },
 
     {

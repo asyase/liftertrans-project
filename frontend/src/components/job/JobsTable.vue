@@ -76,7 +76,6 @@ export default {
     </thead>
 
     <tbody>
-
       <!-- Nr on lihtsalt rea järjekorranumber (index algab 0-st, seepärast + 1), mitte töö ID -->
       <tr v-for="(job, index) in jobs" :key="job.jobId">
         <td>{{ index + 1 }}</td>
@@ -115,8 +114,11 @@ export default {
 
         <td>
           <!-- Üleminek teisele lehele → RouterLink (saab avada ka uues vahekaardis) -->
-          <!-- TODO: kui /jobs/:id ja /jobs/:id/edit rajad on routeris olemas, kasuta nime järgi: { name: 'job-detail', params: { id } } -->
-          <RouterLink :to="`/jobs/${job.jobId}`" class="btn btn-sm btn-outline-primary me-2">
+          <!-- TODO: kui /jobs/:id/edit rada on routeris olemas, kasuta ka Muuda juures nime: { name: 'job-edit', params: { id } } -->
+          <RouterLink
+            :to="{ name: 'job-detail', params: { id: job.jobId } }"
+            class="btn btn-sm btn-outline-primary me-2"
+          >
             Vaata
           </RouterLink>
 
