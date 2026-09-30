@@ -47,18 +47,6 @@ export default {
       this.errorMessage = 'Juhtide laadimine ebaõnnestus.'
     },
 
-    goToAddDriver() {
-      this.$router.push('/drivers/new')
-    },
-
-    goToViewDriver(driverId) {
-      this.$router.push('/drivers/' + driverId)
-    },
-
-    goToEditDriver(driverId) {
-      this.$router.push('/drivers/' + driverId + '/edit')
-    },
-
     deleteDriver(driverId) {
 
       // kinnitusaken
@@ -94,7 +82,7 @@ export default {
         <input v-model="searchText" type="text" class="form-control" placeholder="Otsi juhti" />
       </div>
       <div class="col-auto">
-        <button class="btn btn-danger" @click="goToAddDriver">+ Lisa juht</button>
+        <RouterLink :to="{ name: 'driver-create' }" class="btn btn-danger">+ Lisa juht</RouterLink>
       </div>
     </div>
     <table class="table table-hover">
@@ -115,13 +103,19 @@ export default {
           <td>{{ driver.email }}</td>
           <td>{{ driver.active ? 'Aktiivne' : 'Mitteaktiivne' }}</td>
           <td>
-            <button class="btn btn-danger me-2" @click="goToViewDriver(driver.driverId)">
+            <RouterLink
+              :to="{ name: 'driver-detail', params: { id: driver.driverId } }"
+              class="btn btn-danger me-2"
+            >
               Vaata
-            </button>
+            </RouterLink>
 
-            <button class="btn btn-outline-secondary me-2" @click="goToEditDriver(driver.driverId)">
+            <RouterLink
+              :to="{ name: 'driver-edit', params: { id: driver.driverId } }"
+              class="btn btn-outline-secondary me-2"
+            >
               Muuda
-            </button>
+            </RouterLink>
 
             <button class="btn btn-dark" @click="deleteDriver(driver.driverId)">Kustuta</button>
           </td>

@@ -6,8 +6,6 @@ export default {
     jobs: {},
   },
 
-  emits: ['event-job-view-click', 'event-job-edit-click'],
-
   methods: {
     formatDate(dateTime) {
       // Kui kuupäeva ei ole, kuvame "-"
@@ -116,19 +114,15 @@ export default {
         </td>
 
         <td>
-          <button
-            @click="$emit('event-job-view-click', job.jobId)"
-            class="btn btn-sm btn-outline-primary me-2"
-          >
+          <!-- Üleminek teisele lehele → RouterLink (saab avada ka uues vahekaardis) -->
+          <!-- TODO: kui /jobs/:id ja /jobs/:id/edit rajad on routeris olemas, kasuta nime järgi: { name: 'job-detail', params: { id } } -->
+          <RouterLink :to="`/jobs/${job.jobId}`" class="btn btn-sm btn-outline-primary me-2">
             Vaata
-          </button>
+          </RouterLink>
 
-          <button
-            @click="$emit('event-job-edit-click', job.jobId)"
-            class="btn btn-sm btn-outline-secondary"
-          >
+          <RouterLink :to="`/jobs/${job.jobId}/edit`" class="btn btn-sm btn-outline-secondary">
             Muuda
-          </button>
+          </RouterLink>
         </td>
       </tr>
     </tbody>

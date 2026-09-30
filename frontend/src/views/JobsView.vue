@@ -89,18 +89,6 @@ export default {
       // Dropdowni või kuupäeva muutmisel laadime andmed uuesti
       this.getJobs()
     },
-
-    handleJobViewClick(jobId) {
-      NavigationService.navigateToJobDetailView(jobId)
-    },
-
-    handleJobEditClick(jobId) {
-      NavigationService.navigateToJobEditView(jobId)
-    },
-
-    handleAddJobClick() {
-      NavigationService.navigateToJobCreateView()
-    },
   },
 }
 </script>
@@ -113,7 +101,9 @@ export default {
       </div>
 
       <div class="col text-end">
-        <button @click="handleAddJobClick" class="btn btn-primary">+ Lisa uus tellimus</button>
+        <RouterLink :to="{ name: 'job-create' }" class="btn btn-primary">
+          + Lisa uus tellimus
+        </RouterLink>
       </div>
     </div>
 
@@ -171,10 +161,6 @@ export default {
     </div>
 
     <!-- Tööde tabel -->
-    <JobsTable
-      :jobs="jobs"
-      @event-job-view-click="handleJobViewClick"
-      @event-job-edit-click="handleJobEditClick"
-    />
+    <JobsTable :jobs="jobs" />
   </div>
 </template>
