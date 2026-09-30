@@ -70,6 +70,22 @@ public class JobController {
         return jobService.getExecutionTypes();
     }
 
+    @GetMapping("/jobs/{jobId}")
+    @Operation(summary = "Ühe töö andmed detailvaate jaoks")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "'message': Ei leidnud primary keyd 'jobId' väärtusega: 'y', 'errorCode': PRIMARY_KEY_NOT_FOUND",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            )
+    })
+    public JobDetailDto getJob(@PathVariable Integer jobId) {
+
+        // jobId tuleb URL-ist, nt /api/jobs/2 → jobId = 2
+        return jobService.getJob(jobId);
+    }
+
     @PostMapping("/jobs")
     @Operation(
             summary = "Uue töö loomine. Tagastab loodud töö jobId ja staatuse"

@@ -2,9 +2,11 @@ package ee.liftertrans.service;
 
 import ee.liftertrans.dto.JobCreateRequestDto;
 import ee.liftertrans.dto.JobCreateResponseDto;
+import ee.liftertrans.dto.JobDetailDto;
 import ee.liftertrans.dto.JobDto;
 import ee.liftertrans.dto.SelectOptionDto;
 import ee.liftertrans.infrastructure.exception.IncorrectInputException;
+import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
 import ee.liftertrans.mapper.JobMapper;
 import ee.liftertrans.persistence.entity.Job;
 import ee.liftertrans.persistence.enums.ExecutionType;
@@ -40,6 +42,21 @@ public class JobService {
         return jobDtos;
     }
 
+
+    public JobDetailDto getJob(Integer jobId) {
+
+        // Leiame töö andmebaasist (kui pole, siis 404)
+        Job job = getValidJobBy(jobId);
+
+        // Muudame Entity DTO-ks
+        return jobMapper.toJobDetailDto(job);
+    }
+
+    public Job getValidJobBy(Integer jobId) {
+        // Otsime töö ID järgi, kui ei leia, siis 404
+        return jobRepository.findById(jobId)
+                .orElseThrow(() -> new PrimaryKeyNotFoundException("jobId", jobId));
+    }
 
     public List<SelectOptionDto> getJobTypes() {
 

@@ -62,7 +62,7 @@ export default {
   <table class="table table-hover">
     <thead>
       <tr>
-        <th scope="col">ID</th>
+        <th scope="col">Nr</th>
         <th scope="col">Kuupäev</th>
         <th scope="col">Klient</th>
         <th scope="col">Töö tüüp</th>
@@ -76,10 +76,10 @@ export default {
     </thead>
 
     <tbody>
-      <!-- VIGA OLI: kasutasin job.id, aga backend saadab välja nimega jobId → ID veerg oli tühi
-           ja nupud Vaata/Muuda saatsid undefined. -->
-      <tr v-for="job in jobs" :key="job.jobId">
-        <td>{{ job.jobId }}</td>
+
+      <!-- Nr on lihtsalt rea järjekorranumber (index algab 0-st, seepärast + 1), mitte töö ID -->
+      <tr v-for="(job, index) in jobs" :key="job.jobId">
+        <td>{{ index + 1 }}</td>
 
         <td>
           {{ formatDate(job.plannedStartTime) }}
