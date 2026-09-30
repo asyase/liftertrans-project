@@ -348,7 +348,7 @@ export default {
     </div>
 
     <div class="d-flex gap-2 justify-content-end">
-      <button class="btn btn-outline-secondary">Tühista</button>
+      <RouterLink :to="{ name: 'jobsRoute' }" class="btn btn-outline-secondary">Tühista</RouterLink>
       <button @click="createJob" :disabled="isLoading" class="btn btn-primary px-4">
         Salvesta
       </button>

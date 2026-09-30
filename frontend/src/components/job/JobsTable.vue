@@ -6,8 +6,6 @@ export default {
     jobs: {},
   },
 
-  emits: ['event-job-view-click', 'event-job-edit-click'],
-
   methods: {
     formatDate(dateTime) {
       // Kui kuupäeva ei ole, kuvame "-"
@@ -64,7 +62,7 @@ export default {
   <table class="table table-hover">
     <thead>
       <tr>
-        <th scope="col">ID</th>
+        <th scope="col">Nr</th>
         <th scope="col">Kuupäev</th>
         <th scope="col">Klient</th>
         <th scope="col">Töö tüüp</th>
@@ -78,10 +76,9 @@ export default {
     </thead>
 
     <tbody>
-      <!-- VIGA OLI: kasutasin job.id, aga backend saadab välja nimega jobId → ID veerg oli tühi
-           ja nupud Vaata/Muuda saatsid undefined. -->
-      <tr v-for="job in jobs" :key="job.jobId">
-        <td>{{ job.jobId }}</td>
+      <!-- Nr on lihtsalt rea järjekorranumber (index algab 0-st, seepärast + 1), mitte töö ID -->
+      <tr v-for="(job, index) in jobs" :key="job.jobId">
+        <td>{{ index + 1 }}</td>
 
         <td>
           {{ formatDate(job.plannedStartTime) }}
@@ -116,19 +113,18 @@ export default {
         </td>
 
         <td>
-          <button
-            @click="$emit('event-job-view-click', job.jobId)"
+          <!-- Üleminek teisele lehele → RouterLink (saab avada ka uues vahekaardis) -->
+          <!-- TODO: kui /jobs/:id/edit rada on routeris olemas, kasuta ka Muuda juures nime: { name: 'job-edit', params: { id } } -->
+          <RouterLink
+            :to="{ name: 'job-detail', params: { id: job.jobId } }"
             class="btn btn-sm btn-outline-primary me-2"
           >
             Vaata
-          </button>
+          </RouterLink>
 
-          <button
-            @click="$emit('event-job-edit-click', job.jobId)"
-            class="btn btn-sm btn-outline-secondary"
-          >
+          <RouterLink :to="`/jobs/${job.jobId}/edit`" class="btn btn-sm btn-outline-secondary">
             Muuda
-          </button>
+          </RouterLink>
         </td>
       </tr>
     </tbody>
