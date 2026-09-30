@@ -1,4 +1,6 @@
 <script>
+import SessionStorageService from '@/services/SessionStorageService.js'
+import NavigationService from '@/services/NavigationService.js'
 import DriverService from '@/services/DriverService.js'
 import axios from "axios";
 
@@ -7,6 +9,12 @@ export default {
 
   // Lehe avamisel laadime tööd backendist
   beforeMount() {
+    // Leht on ainult ADMIN-ile — teised suuname lehele "õigused puuduvad"
+    if (!SessionStorageService.userIsAdmin()) {
+      NavigationService.navigateToNotAuthorizedView()
+      return
+    }
+
     this.getDrivers()
   },
 

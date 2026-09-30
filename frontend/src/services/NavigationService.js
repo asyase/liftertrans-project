@@ -16,4 +16,8 @@ export default {
   navigateToErrorView() {
     router.push('/error')
   },
+
+  navigateToNotAuthorizedView() {
+    router.push('/not-authorized')
+  },
 }
