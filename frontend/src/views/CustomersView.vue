@@ -191,8 +191,7 @@ export default {
                 <router-link :to="`/customers/${customer.customerId}`" class="btn btn-danger"
                   >Vaata</router-link
                 >
-                <router-link
-                  :to="`/customers/${customer.customerId}/edit`"
+                <router-link :to="`/customers/${customer.customerId}/edit`"
                   class="btn btn-outline-secondary me-2"
                   >Muuda</router-link
                 >
