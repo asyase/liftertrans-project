@@ -51,17 +51,17 @@ export default {
       this.errorMessage = 'Klientide laadimine ebaõnnestus.'
     },
 
-    goToAddCustomer() {
-      this.$router.push('/customers/new')
-    },
-
-    goToViewCustomer(customerId) {
-      this.$router.push('/customers/' + customerId)
-    },
-
-    goToEditCustomer(customerId) {
-      this.$router.push('/customers/' + customerId + '/edit')
-    },
+    // goToAddCustomer() {
+    //   this.$router.push('/customers/new')
+    // },
+    //
+    // goToViewCustomer(customerId) {
+    //   this.$router.push('/customers/' + customerId)
+    // },
+    //
+    // goToEditCustomer(customerId) {
+    //   this.$router.push('/customers/' + customerId + '/edit')
+    // },
 
     deleteCustomer(customerId) {
       // kinnitusaken
@@ -155,7 +155,7 @@ export default {
             class="search-input"
           />
 
-          <router-link to="/customers/new" class="btn btn-primary"> + Lisa klient </router-link>
+          <router-link to="/customers/new" class="btn btn-danger"> + Lisa klient </router-link>
         </div>
       </header>
 
