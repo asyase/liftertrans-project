@@ -1,46 +1,24 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark lt-navbar px-3 mb-4">
-    <RouterLink class="navbar-brand" to="/login">LIFTERTRANS</RouterLink>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navMenu"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-center" id="navMenu">
-      <!-- ADMIN-i lingid -->
-      <div v-if="isAdmin" class="navbar-nav">
-        <RouterLink class="nav-link" to="/dashboard">Esileht</RouterLink>
-        <RouterLink class="nav-link" to="/jobs">Tellimused</RouterLink>
-        <RouterLink class="nav-link" to="/drivers">Juhid</RouterLink>
-      </div>
+  <div class="d-flex">
+    <!-- Külgmenüü on kõigil lehtedel, aga ainult sisselogitud kasutajale (login lehel pole) -->
+    <AppSidebar v-if="isLoggedIn" :role-name="roleName" @event-logout="logout" />
 
-      <!-- DRIVER-i lingid -->
-      <div v-if="isDriver" class="navbar-nav">
-        <RouterLink class="nav-link" to="/my-jobs">Minu tööd</RouterLink>
-      </div>
-    </div>
-
-    <!-- Logi välja nuppu näitame ainult sisselogitud kasutajale -->
-    <button
-      v-if="isLoggedIn"
-      type="button"
-      class="btn btn-outline-light btn-sm ms-auto"
-      @click="logout"
-    >
-      Logi välja
-    </button>
-  </nav>
-
-  <!-- LoginView saadab pärast sisselogimist event-user-logged-in, siis uuendame menüü -->
-  <RouterView @event-user-logged-in="updateNavMenu" />
+    <main class="flex-grow-1 py-4 lt-main">
+      <!-- LoginView saadab pärast sisselogimist event-user-logged-in, siis uuendame menüü -->
+      <RouterView @event-user-logged-in="updateNavMenu" />
+    </main>
+  </div>
 </template>
 
 <script>
+import AppSidebar from '@/components/AppSidebar.vue'
+
 export default {
   name: 'App',
+
+  components: {
+    AppSidebar,
+  },
 
   data() {
     return {
@@ -52,14 +30,6 @@ export default {
   computed: {
     isLoggedIn() {
       return this.roleName !== null
-    },
-
-    isAdmin() {
-      return this.roleName === 'ADMIN'
-    },
-
-    isDriver() {
-      return this.roleName === 'DRIVER'
     },
   },
 
@@ -77,3 +47,10 @@ export default {
   },
 }
 </script>
+
+<style>
+/* Sisu võtab ülejäänud laiuse; min-width: 0, et laiad tabelid ei lükkaks lehte laiemaks */
+.lt-main {
+  min-width: 0;
+}
+</style>

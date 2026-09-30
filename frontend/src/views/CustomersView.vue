@@ -124,25 +124,8 @@ export default {
 </script>
 
 <template>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <h2 class="brand">LIFTERTRANS</h2>
-      <nav>
-        <ul>
-          <li><router-link to="/">Esileht</router-link></li>
-          <li><router-link to="/calendar">Kalender</router-link></li>
-          <li><router-link to="/orders">Tellimused</router-link></li>
-          <li class="active"><router-link to="/customers">Kliendid</router-link></li>
-          <li><router-link to="/vechicles">Autod</router-link></li>
-          <li><router-link to="/drivers">juhid</router-link></li>
-          <li><router-link to="/reports">Aruanded</router-link></li>
-        </ul>
-      </nav>
-      <div class="logout">
-        <a href="#">Logi välja</a>
-      </div>
-    </aside>
-
+  <!-- Külgmenüü on nüüd App.vue-s (AppSidebar), siin ainult lehe sisu -->
+  <div>
     <main class="main-content">
       <header class="content-header">
         <h1>Kliendid</h1>
@@ -203,39 +186,7 @@ export default {
   </div>
 </template>
 
-<style>
-.app-layout {
-  display: flex;
-  min-height: 100vh;
-  font-family: sans-serif;
-}
-
-.sidebar {
-  width: 200px;
-  border-right: 1px solid #ccc;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  margin-bottom: 12px;
-}
-
-.sidebar li.active a {
-  font-weight: bold;
-  color: #000;
-}
-
-.sidebar .logout {
-  margin-top: auto;
-}
-
+<style scoped>
 .main-content {
   flex: 1;
   padding: 20px 40px;
