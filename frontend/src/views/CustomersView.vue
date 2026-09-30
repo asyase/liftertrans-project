@@ -69,7 +69,9 @@ export default {
         // saadame backendile kustutamise päringu
         axios
           .delete('/api/customers/' + customerId)
-          .then(() => {this.getCustomers()})                // värskendame tabelit
+          .then(() => {
+            this.getCustomers()
+          }) // värskendame tabelit
           .catch((error) => {
             console.error('Kustutamise viga:', error)
             this.errorMessage = 'Kustutamine ebaõnnestus'
@@ -186,9 +188,15 @@ export default {
               <td>{{ customer.invoiceEmail }}</td>
               <td>{{ customer.phone }}</td>
               <td class="actions-cell">
-                <router-link :to="`/customers/${customer.customerId}`">vaata</router-link>
-                <router-link :to="`/customers/${customer.customerId}/edit`">Muuda</router-link>
-                <button @click="confirmDelete(customer)" class="btn-link text-danger">
+                <router-link :to="`/customers/${customer.customerId}`" class="btn btn-danger"
+                  >Vaata</router-link
+                >
+                <router-link
+                  :to="`/customers/${customer.customerId}/edit`"
+                  class="btn btn-outline-secondary me-2"
+                  >Muuda</router-link
+                >
+                <button class="btn btn-dark" @click="deleteCustomer(customer.customerId)">
                   Kustuta
                 </button>
               </td>
@@ -256,15 +264,6 @@ export default {
 .search-input {
   padding: 6px 12px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.btn-primary {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  padding: 6px 12px;
-  text-decoration: none;
-  color: #000;
   border-radius: 4px;
 }
 
