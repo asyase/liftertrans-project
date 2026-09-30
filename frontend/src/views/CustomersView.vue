@@ -188,7 +188,8 @@ export default {
               <td>{{ customer.invoiceEmail }}</td>
               <td>{{ customer.phone }}</td>
               <td class="actions-cell">
-                <router-link :to="`/customers/${customer.customerId}`" class="btn btn-danger"
+                <router-link :to="`/customers/${customer.customerId}`"
+                             class="btn btn-danger"
                   >Vaata</router-link
                 >
                 <router-link :to="`/customers/${customer.customerId}/edit`"
