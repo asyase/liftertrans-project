@@ -15,6 +15,10 @@ import java.time.Instant;
 @Table(name = "job", schema = "liftertrans_project")
 public class Job {
     @Id
+    // VIGA OLI: @GeneratedValue puudus, uue töö id oli null ja tuli viga
+    // "must be manually assigned before calling persist()".
+    // Nüüd annab järgmise id andmebaas ise (job.id on IDENTITY veerg).
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
     @NotNull

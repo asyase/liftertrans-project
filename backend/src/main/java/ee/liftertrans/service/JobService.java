@@ -25,6 +25,8 @@ public class JobService {
     private final JobMapper jobMapper;
     private final DriverService driverService;
     private final VehicleService vehicleService;
+    // Kliendi leidmiseks customerId järgi (sama moodi nagu juht ja sõiduk)
+    private final CustomerService customerService;
 
 
     public List<JobDto> getJobs() {
@@ -101,8 +103,10 @@ public class JobService {
         job.setStatus("DRAFT");
 
 
-        // TODO: leia Customer customerId järgi
-        // job.setCustomer(customer);
+        // VIGA OLI: siin oli ainult TODO, klienti tööle ei pandud ja salvestamine kukkus 500-ga,
+        // sest job.customer_id on andmebaasis NOT NULL.
+        // Klient on kohustuslik — tühja customerId püüab kinni juba @NotNull DTO-s.
+        job.setCustomer(customerService.getValidCustomerBy(request.getCustomerId()));
 
         // Sõiduk (ainult kui on valitud)
         if (request.getVehicleId() != null) {

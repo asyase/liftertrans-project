@@ -17,6 +17,10 @@ public interface JobMapper {
 
     // Job -> JobListDto
 
+    // VIGA OLI: see rida puudus ja nimekirjas oli jobId alati null (ID veerg tühi).
+    // Entity-s on väli id, DTO-s jobId — nimed on erinevad, seega MapStruct ise neid ei seo.
+    // Hoiatust ka ei tulnud, sest unmappedTargetPolicy = IGNORE.
+    @Mapping(source = "id", target = "jobId")
     @Mapping(source = "customer.name", target = "customerName")
     @Mapping(source = "vehicle.registrationNumber", target = "vehicleRegistrationNumber")
     @Mapping(source = "driver.name", target = "driverName")

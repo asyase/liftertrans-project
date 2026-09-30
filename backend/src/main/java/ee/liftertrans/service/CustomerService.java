@@ -3,7 +3,9 @@ package ee.liftertrans.service;
 import ee.liftertrans.dto.CustomerDto;
 import ee.liftertrans.infrastructure.exception.BusinessException;
 import ee.liftertrans.infrastructure.exception.ErrorCode;
+import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
 import ee.liftertrans.mapper.CustomerMapper;
+import ee.liftertrans.persistence.entity.Customer;
 import ee.liftertrans.persistence.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,5 +27,13 @@ public class CustomerService {
         var customers = customerRepository.findBySearchTerm(search);
         return customerMapper.toCustomerDtos(customers);
 
+    }
+
+    // Seda kasutab JobService uue tellimuse loomisel, et customerId järgi päris Customer kätte saada
+    public Customer getValidCustomerBy(Integer customerId) {
+
+        // Otsime kliendi ID järgi, kui ei leia, siis 404 (PRIMARY_KEY_NOT_FOUND)
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new PrimaryKeyNotFoundException("customerId", customerId));
     }
 }

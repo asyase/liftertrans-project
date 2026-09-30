@@ -147,7 +147,12 @@ export default {
         .then((response) => {
           const jobId = response.data.jobId
 
-          this.$router.push(`/jobs/${jobId}/edit`)
+          // Muutmise vaadet (/jobs/:id/edit) veel pole, seega suuname tellimuste nimekirja.
+          // Teate anname kaasa URL-i query parameetrina, JobsView loeb selle beforeMount-is välja.
+          this.$router.push({
+            path: '/jobs',
+            query: { successMessage: `Tellimus #${jobId} loodud` },
+          })
         })
         .catch((error) => {
           this.errorMessage = error.response?.data?.message || 'Töö loomine ebaõnnestus'
@@ -224,8 +229,8 @@ export default {
             <div
               v-for="executionType in executionTypes"
               :key="executionType.value"
-              class="form-check form-check-inline mt-2">
-
+              class="form-check form-check-inline mt-2"
+            >
               <input
                 type="radio"
                 class="form-check-input"
