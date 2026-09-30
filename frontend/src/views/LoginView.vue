@@ -4,6 +4,9 @@ import AuthService from '@/services/AuthService.js'
 export default {
   name: 'LoginView',
 
+  // Anname App.vue-le teada, et kasutaja logis sisse (menüü tuleb uuendada)
+  emits: ['event-user-logged-in'],
+
   // Vormi andmed ja olek
   data() {
     return {
@@ -45,14 +48,27 @@ export default {
       console.log('Roll', user.roleName)
 
       if (user.roleName === 'ADMIN') {
+        this.saveLoggedInUser(user)
         return this.$router.push('/dashboard')
       }
 
       if (user.roleName === 'DRIVER') {
+        this.saveLoggedInUser(user)
         return this.$router.push('/my-jobs')
       }
 
-      this.errorMessage='Tundmatu kasutajaroll'
+      this.errorMessage = 'Tundmatu kasutajaroll'
+    },
+
+    // Salvestame sisselogitud kasutaja andmed brauserisse (sessionStorage kaob vahelehe sulgemisel)
+    saveLoggedInUser(user) {
+      sessionStorage.setItem('userId', user.userId)
+      sessionStorage.setItem('roleName', user.roleName)
+      // ADMIN-il driverId puudub (null) — salvestame siis tühja stringi, mitte "null"
+      sessionStorage.setItem('driverId', user.driverId ?? '')
+
+      // App.vue kuulab seda sündmust ja näitab menüüs õige rolli lingid
+      this.$emit('event-user-logged-in')
     },
 
     // Töötle sisselogimise viga

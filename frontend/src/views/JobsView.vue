@@ -1,4 +1,5 @@
 <script>
+import SessionStorageService from '@/services/SessionStorageService.js'
 import JobsTable from '@/components/job/JobsTable.vue'
 import JobService from '@/services/JobService.js'
 import NavigationService from '@/services/NavigationService.js'
@@ -11,6 +12,12 @@ export default {
   },
 
   beforeMount() {
+    // Leht on ainult ADMIN-ile — teised suuname lehele "õigused puuduvad"
+    if (!SessionStorageService.userIsAdmin()) {
+      NavigationService.navigateToNotAuthorizedView()
+      return
+    }
+
     // Pärast uue tellimuse loomist tuleb teade URL-i query parameetrina (?successMessage=...).
     // Kui lehele tullakse muul moel, siis teadet pole → tühi string.
     this.successMessage = this.$route.query.successMessage ?? ''

@@ -1,4 +1,6 @@
 <script>
+import SessionStorageService from '@/services/SessionStorageService.js'
+import NavigationService from '@/services/NavigationService.js'
 import JobService from '@/services/JobService.js'
 import CustomerService from '@/services/CustomerService.js'
 import VehicleService from '@/services/VehicleService.js'
@@ -74,6 +76,12 @@ export default {
     }
   },
   beforeMount() {
+    // Leht on ainult ADMIN-ile — teised suuname lehele "õigused puuduvad"
+    if (!SessionStorageService.userIsAdmin()) {
+      NavigationService.navigateToNotAuthorizedView()
+      return
+    }
+
     this.getCustomers()
     this.getJobTypes()
     this.getExecutionTypes()
