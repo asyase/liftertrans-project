@@ -38,7 +38,6 @@ export default {
   methods: {
     getCustomers() {
       CustomerService.getCustomersRequest()
-
         .then((response) => this.handleGetCustomers(response))
         .catch((error) => this.handleGetCustomersErrorResponse(error))
     },
@@ -48,7 +47,7 @@ export default {
       console.log('Kliendid', this.customers)
     },
 
-    handleGetCustomersErrorResponse(error) {
+    handleGetCustomersErrorResponse() {
       this.errorMessage = 'Klientide laadimine ebaõnnestus.'
     },
 
@@ -176,7 +175,7 @@ export default {
           </thead>
 
           <tbody>
-            <tr v-for="(customer, index) in customers" :key="customer.customerId">
+            <tr v-for="(customer, index) in filteredCustomers" :key="customer.customerId">
               <td>{{ index + 1 }}</td>
               <td>{{ customer.name }}</td>
               <td>{{ customer.companyName }}</td>
