@@ -11,6 +11,10 @@ export default {
   },
 
   beforeMount() {
+    // Pärast uue tellimuse loomist tuleb teade URL-i query parameetrina (?successMessage=...).
+    // Kui lehele tullakse muul moel, siis teadet pole → tühi string.
+    this.successMessage = this.$route.query.successMessage ?? ''
+
     // Lehe avamisel laadime tööd backendist
     this.getJobs()
   },
@@ -19,6 +23,7 @@ export default {
     return {
       jobs: [],
 
+      successMessage: '',
       errorMessage: '',
 
       filters: {
@@ -103,6 +108,12 @@ export default {
       <div class="col text-end">
         <button @click="handleAddJobClick" class="btn btn-primary">+ Lisa uus tellimus</button>
       </div>
+    </div>
+
+    <!-- Õnnestumise teade (nt pärast uue tellimuse loomist) -->
+    <div v-if="successMessage" class="alert alert-success alert-dismissible" role="alert">
+      {{ successMessage }}
+      <button type="button" class="btn-close" @click="successMessage = ''"></button>
     </div>
 
     <!-- Kiirfiltrid -->

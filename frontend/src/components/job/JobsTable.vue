@@ -78,8 +78,10 @@ export default {
     </thead>
 
     <tbody>
-      <tr v-for="job in jobs" :key="job.id">
-        <td>{{ job.id }}</td>
+      <!-- VIGA OLI: kasutasin job.id, aga backend saadab välja nimega jobId → ID veerg oli tühi
+           ja nupud Vaata/Muuda saatsid undefined. -->
+      <tr v-for="job in jobs" :key="job.jobId">
+        <td>{{ job.jobId }}</td>
 
         <td>
           {{ formatDate(job.plannedStartTime) }}
@@ -115,14 +117,14 @@ export default {
 
         <td>
           <button
-            @click="$emit('event-job-view-click', job.id)"
+            @click="$emit('event-job-view-click', job.jobId)"
             class="btn btn-sm btn-outline-primary me-2"
           >
             Vaata
           </button>
 
           <button
-            @click="$emit('event-job-edit-click', job.id)"
+            @click="$emit('event-job-edit-click', job.jobId)"
             class="btn btn-sm btn-outline-secondary"
           >
             Muuda

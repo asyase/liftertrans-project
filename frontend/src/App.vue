@@ -1,6 +1,6 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3 mb-3">
-    <RouterLink class="navbar-brand" to="/">Minu Projekt</RouterLink>
+  <nav class="navbar navbar-expand-lg navbar-dark lt-navbar px-3 mb-4">
+    <RouterLink class="navbar-brand" to="/">LIFTERTRANS</RouterLink>
     <button
       class="navbar-toggler"
       type="button"
