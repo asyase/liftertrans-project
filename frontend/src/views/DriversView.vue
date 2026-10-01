@@ -2,7 +2,7 @@
 import SessionStorageService from '@/services/SessionStorageService.js'
 import NavigationService from '@/services/NavigationService.js'
 import DriverService from '@/services/DriverService.js'
-import axios from "axios";
+import axios from 'axios'
 
 export default {
   name: 'DriversView',
@@ -48,23 +48,21 @@ export default {
     },
 
     deleteDriver(driverId) {
-
       // kinnitusaken
       if (confirm('Kas oled kindel, et soovid selle juhi kustutada?')) {
+        // saadame backendile kustutamise päringu
+        axios
+          .delete('/api/drivers/' + driverId)
+          .then(() => {
+            // värskendame tabelit
+            this.getDrivers()
+          })
 
-      // saadame backendile kustutamise päringu
-      axios.delete('/api/drivers/' + driverId)
-        .then(() => {
-
-          // värskendame tabelit
-          this.getDrivers()
-        })
-
-          .catch(error => {
+          .catch((error) => {
             this.errorMessage = 'Kustutamine ebaõnnestus'
           })
       }
-    }
+    },
   },
 }
 </script>
@@ -77,12 +75,12 @@ export default {
 
     <h1>Juhid</h1>
 
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-4">
         <input v-model="searchText" type="text" class="form-control" placeholder="Otsi juhti" />
       </div>
       <div class="col-auto">
-        <RouterLink :to="{ name: 'driver-create' }" class="btn btn-danger">+ Lisa juht</RouterLink>
+        <RouterLink :to="{ name: 'driver-create' }" class="btn btn-primary ms-2">+ Lisa juht</RouterLink>
       </div>
     </div>
     <table class="table table-hover">
@@ -105,19 +103,21 @@ export default {
           <td>
             <RouterLink
               :to="{ name: 'driver-detail', params: { id: driver.driverId } }"
-              class="btn btn-danger me-2"
+              class="btn btn-sm btn-outline-primary me-2"
             >
               Vaata
             </RouterLink>
 
             <RouterLink
               :to="{ name: 'driver-edit', params: { id: driver.driverId } }"
-              class="btn btn-outline-secondary me-2"
+              class="btn btn-sm btn-outline-secondary me-2"
             >
               Muuda
             </RouterLink>
 
-            <button class="btn btn-dark" @click="deleteDriver(driver.driverId)">Kustuta</button>
+            <button class="btn btn-outline-dark btn-sm me-2" @click="deleteDriver(driver.driverId)">
+              Kustuta
+            </button>
           </td>
         </tr>
       </tbody>
