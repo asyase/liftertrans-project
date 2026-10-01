@@ -76,7 +76,9 @@ export default {
           })
 
           .catch((error) => {
-            this.errorMessage = 'Kustutamine ebaõnnestus'
+            // Näitame backendi tegelikku veateadet (nt "juhiga on seotud tellimusi"),
+            // kui seda pole, siis üldist teadet
+            this.errorMessage = error.response?.data?.message ?? 'Kustutamine ebaõnnestus'
           })
       }
     },
