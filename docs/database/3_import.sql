@@ -214,6 +214,14 @@ INSERT INTO "user" (
           2,
           1,
           'D'
+      ),
+      (
+          4,
+          'admin',
+          '123',
+          1,
+          NULL,
+          'A'
       );
 
 

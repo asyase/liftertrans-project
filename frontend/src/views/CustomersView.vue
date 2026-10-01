@@ -80,49 +80,6 @@ export default {
     },
   },
 }
-//
-// import { ref, onMounted } from 'vue'
-// import data from 'bootstrap/js/src/dom/data.js'
-// // import { useRouter } from 'vue-router'
-//
-// // const router = useRouter()
-// const customers = ref([])
-// const searchQuery = ref('')
-//
-// const fetchCustomers = async () => {
-//   try {
-//     const response = await axios.get('/api/customers', {
-//       params: searchQuery.value ? { search: searchQuery.value } : {},
-//     })
-//
-//     customers.value = response.data
-//   } catch (error) {
-//     console.error('Viga klientide laadimisel:', error)
-//   }
-// }
-//
-// // Kustutamise kinnitamine ja API teostus
-// /* const confirmDelete = async (customer) => {
-//   if (confirm(`Kas oled kindel, et soovid kliendi "${customer.name}" kustutada?`)) {
-//     try {
-//       await axios.delete(`/api/customers/${customer.customerId}`)
-//       // Värskenda nimekirja pärast edukat kustutamist
-//       fetchCustomers()
-//     } catch (error) {
-//       // Axiose vea vastus asub error.response sees
-//       if (error.response) {
-//         alert(`Viga kustutamisel: ${error.response.data.message}`)
-//       } else {
-//         console.error('Viga kustutamisel:', error)
-//       }
-//     }
-//   }
-// }*/
-//
-//
-// onMounted(() => {
-//   fetchCustomers()
-// })
 </script>
 
 <template>
@@ -140,7 +97,7 @@ export default {
             class="search-input"
           />
 
-          <router-link to="/customers/new" class="btn btn-danger"> + Lisa klient </router-link>
+          <router-link to="/customers/new" class="btn btn-primary"> + Lisa klient </router-link>
         </div>
       </header>
 
@@ -170,18 +127,16 @@ export default {
               <td>{{ customer.email }}</td>
               <td>{{ customer.invoiceEmail }}</td>
               <td>{{ customer.phone }}</td>
-              <td class="actions-cell">
-                <router-link :to="`/customers/${customer.customerId}`"
-                             class="btn btn-danger"
-                  >Vaata</router-link
-                >
-                <router-link :to="`/customers/${customer.customerId}/edit`"
+              <td>
+                <router-link :to="`/customers/${customer.customerId}`" class="btn btn-danger me-2"
+                  >Vaata
+                </router-link>
+                <router-link
+                  :to="`/customers/${customer.customerId}/edit`"
                   class="btn btn-outline-secondary me-2"
-                  >Muuda</router-link
-                >
-                <button class="btn btn-dark" @click="deleteCustomer(customer.customerId)">
-                  Kustuta
-                </button>
+                  >Muuda
+                </router-link>
+                <button @click="deleteCustomer(customer)" class="btn btn-dark">Kustuta</button>
               </td>
             </tr>
             <tr v-if="customers.length === 0">
@@ -218,6 +173,15 @@ export default {
   border-radius: 4px;
 }
 
+.btn-primary {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  text-decoration: none;
+  color: #000;
+  border-radius: 4px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -236,20 +200,6 @@ th {
 }
 
 .actions-cell a,
-.btn-link {
-  margin-right: 8px;
-  color: #0066cc;
-  text-decoration: underline;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.text-danger {
-  color: #cc0000;
-}
-
 .text-center {
   text-align: center;
 }
