@@ -128,14 +128,12 @@ export default {
               <td>{{ customer.invoiceEmail }}</td>
               <td>{{ customer.phone }}</td>
               <td>
-                <router-link
-                  :to="`/customers/${customer.customerId}`"
-                  class="btn btn-sm btn-outline-primary me-2"
+                <router-link :to="`/customers/${customer.customerId}`" class="btn btn-danger me-2"
                   >Vaata
                 </router-link>
                 <router-link
                   :to="`/customers/${customer.customerId}/edit`"
-                  class="btn btn-sm btn-outline-secondary"
+                  class="btn btn-outline-secondary me-2"
                   >Muuda
                 </router-link>
                 <button @click="deleteCustomer(customer)" class="btn btn-dark">Kustuta</button>
@@ -202,7 +200,6 @@ th {
 }
 
 .actions-cell a,
-
 .text-center {
   text-align: center;
 }
