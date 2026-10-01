@@ -227,9 +227,9 @@ public class JobService {
         }
 
 
-        // TRANSPORT_AND_CRANE puhul
+        // TRANSPORT ja TRANSPORT_AND_CRANE puhul
         // on vajalik pealevõtu aadress
-        if ("TRANSPORT_AND_CRANE".equals(jobType)
+        if (isTransportJob(jobType)
                 && (request.getPickupAddress() == null
                 || request.getPickupAddress().isBlank())) {
 
@@ -240,9 +240,9 @@ public class JobService {
         }
 
 
-        // TRANSPORT_AND_CRANE puhul
+        // TRANSPORT ja TRANSPORT_AND_CRANE puhul
         // on vajalik kohaletoimetamise aadress
-        if ("TRANSPORT_AND_CRANE".equals(jobType)
+        if (isTransportJob(jobType)
                 && (request.getDeliveryAddress() == null
                 || request.getDeliveryAddress().isBlank())) {
 
@@ -251,5 +251,10 @@ public class JobService {
                     "INCORRECT_INPUT"
             );
         }
+    }
+
+    // Transporditööl (TRANSPORT, TRANSPORT_AND_CRANE) on pealevõtu ja kohaletoimetamise aadress
+    private boolean isTransportJob(String jobType) {
+        return "TRANSPORT".equals(jobType) || "TRANSPORT_AND_CRANE".equals(jobType);
     }
 }

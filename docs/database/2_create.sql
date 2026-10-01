@@ -79,9 +79,9 @@ CREATE TABLE job (
                      updated_at timestamp  NULL,
                      CONSTRAINT JOB_status_ck CHECK (( status IN ( 'DRAFT' , 'PLANNED' , 'IN_PROGRESS' , 'COMPLETED' , 'CANCELLED' ) )) NOT DEFERRABLE INITIALLY IMMEDIATE,
                      CONSTRAINT JOB_assignment_ck CHECK (( ( ( execution_type = 'INTERNAL' AND subcontractor_id IS NULL ) OR ( execution_type = 'SUBCONTRACTED' AND subcontractor_id IS NOT NULL AND driver_id IS NULL ) ) )) NOT DEFERRABLE INITIALLY IMMEDIATE,
-                     CONSTRAINT JOB_job_type_ck CHECK (( job_type IN ( 'TRANSPORT_AND_CRANE' , 'CRANE_ONLY' ) )) NOT DEFERRABLE INITIALLY IMMEDIATE,
+                     CONSTRAINT JOB_job_type_ck CHECK (( job_type IN ( 'TRANSPORT_AND_CRANE' , 'CRANE_ONLY' , 'TRANSPORT' ) )) NOT DEFERRABLE INITIALLY IMMEDIATE,
                      CONSTRAINT JOB_execution_type_ck CHECK (( execution_type IN ( 'INTERNAL' , 'SUBCONTRACTED' ) )) NOT DEFERRABLE INITIALLY IMMEDIATE,
-                     CONSTRAINT JOB_address_ck CHECK (( ( ( job_type = 'CRANE_ONLY' AND service_address IS NOT NULL ) OR ( job_type = 'TRANSPORT_AND_CRANE' AND pickup_address IS NOT NULL AND delivery_address IS NOT NULL ) ) )) NOT DEFERRABLE INITIALLY IMMEDIATE,
+                     CONSTRAINT JOB_address_ck CHECK (( ( ( job_type = 'CRANE_ONLY' AND service_address IS NOT NULL ) OR ( job_type IN ( 'TRANSPORT_AND_CRANE' , 'TRANSPORT' ) AND pickup_address IS NOT NULL AND delivery_address IS NOT NULL ) ) )) NOT DEFERRABLE INITIALLY IMMEDIATE,
                      CONSTRAINT JOB_pk PRIMARY KEY (id)
 );
 

@@ -70,7 +70,8 @@ class JobServiceTest {
 
         assertEquals(List.of(
                 new SelectOptionDto("TRANSPORT_AND_CRANE", "Transport ja kraana"),
-                new SelectOptionDto("CRANE_ONLY", "Ainult kraana")
+                new SelectOptionDto("CRANE_ONLY", "Ainult kraana"),
+                new SelectOptionDto("TRANSPORT", "Ainult transport")
         ), jobTypes);
     }
 

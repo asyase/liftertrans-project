@@ -1,11 +1,19 @@
 <script>
 import axios from 'axios'
 import CustomerService from '@/services/CustomerService.js'
+import SessionStorageService from '@/services/SessionStorageService.js'
+import NavigationService from '@/services/NavigationService.js'
 
 export default {
   name: 'CustomersView',
 
   beforeMount() {
+    // Leht on ainult ADMIN-ile — teised suuname lehele "õigused puuduvad"
+    if (!SessionStorageService.userIsAdmin()) {
+      NavigationService.navigateToNotAuthorizedView()
+      return
+    }
+
     this.getCustomers()
   },
   data() {

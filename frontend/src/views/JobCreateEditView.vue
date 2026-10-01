@@ -296,8 +296,11 @@ export default {
           />
         </div>
 
-        <!-- TRANSPORT_AND_CRANE → pealevõtu ja kohaletoimetamise aadress -->
-        <div v-if="job.jobType === 'TRANSPORT_AND_CRANE'" class="row g-3">
+        <!-- TRANSPORT ja TRANSPORT_AND_CRANE → pealevõtu ja kohaletoimetamise aadress -->
+        <div
+          v-if="job.jobType === 'TRANSPORT' || job.jobType === 'TRANSPORT_AND_CRANE'"
+          class="row g-3"
+        >
           <div class="col-md-6">
             <label for="pickupAddress" class="form-label">Pealevõtu aadress</label>
             <input

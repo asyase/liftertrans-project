@@ -51,6 +51,9 @@ export default {
       if (jobType === 'TRANSPORT_AND_CRANE') {
         return 'Transport + kraanatöö'
       }
+      if (jobType === 'TRANSPORT') {
+        return 'Transport'
+      }
 
       return jobType
     },
