@@ -35,12 +35,15 @@ export default {
 
     <nav>
       <!-- ADMIN-i lingid -->
-      <!-- TODO: Kalender, Autod ja Aruanded lisame, kui nende vaated on olemas -->
+      <!-- TODO: Autod ja Aruanded lisame, kui nende vaated on olemas -->
       <ul v-if="isAdmin">
         <li>
           <RouterLink to="/dashboard" :class="{ active: isActive('/dashboard') }"
-            >Esileht</RouterLink
+            >Töölaud</RouterLink
           >
+        </li>
+        <li>
+          <RouterLink to="/calendar" :class="{ active: isActive('/calendar') }">Kalender</RouterLink>
         </li>
         <li>
           <RouterLink to="/jobs" :class="{ active: isActive('/jobs') }">Tellimused</RouterLink>
@@ -128,5 +131,44 @@ export default {
 
 .lt-sidebar-logout {
   margin-top: auto;
+}
+
+/* Mobiilivaade: külgmenüü muutub ülemiseks ribaks, lingid ja väljalogimine ühte ritta */
+@media (max-width: 767.98px) {
+  .lt-sidebar {
+    width: 100%;
+    min-height: auto;
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 12px 16px;
+  }
+
+  .lt-sidebar-brand {
+    margin-bottom: 0;
+    font-size: 1.3rem;
+  }
+
+  .lt-sidebar nav {
+    flex-basis: 100%;
+    order: 3;
+  }
+
+  .lt-sidebar ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+
+  .lt-sidebar li a {
+    margin-bottom: 0;
+  }
+
+  .lt-sidebar-logout {
+    margin-top: 0;
+    margin-left: auto;
+  }
 }
 </style>

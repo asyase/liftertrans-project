@@ -2,13 +2,13 @@
 import CustomerService from '@/services/CustomerService.js'
 import SessionStorageService from '@/services/SessionStorageService.js'
 import NavigationService from '@/services/NavigationService.js'
-import { PhMagnifyingGlass } from '@phosphor-icons/vue'
+import SearchBar from '@/components/SearchBar.vue'
 
 export default {
   name: 'CustomersView',
 
   components: {
-    PhMagnifyingGlass,
+    SearchBar,
   },
 
   beforeMount() {
@@ -85,47 +85,34 @@ export default {
 </script>
 
 <template>
-  <div>
-    <main class="main-content">
-      <header class="content-header">
-        <h1>Kliendid</h1>
-        <div class="actions">
-          <div class="search-wrapper">
-            <input
-                v-model="searchText"
-                type="text"
-                placeholder="Otsi (nimi või ettevõte)..."
-                class="search-input"
-                @keyup.enter="search"
-            />
-            <button type="button" class="search-btn" @click="search" title="Otsi">
-              <PhMagnifyingGlass :size="18" />
-            </button>
-          </div>
+  <div class="container-fluid px-4">
+    <h1 class="mb-4">Kliendid</h1>
 
-          <router-link to="/customers/new" class="btn btn-primary"> + Lisa klient </router-link>
-        </div>
-      </header>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <SearchBar v-model="searchText" placeholder="Otsi (nimi või ettevõte)" @search="search" />
 
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <RouterLink to="/customers/new" class="btn btn-primary">+ Lisa klient</RouterLink>
+    </div>
 
-      <div class="table-container">
-        <table>
-          <thead>
+    <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
           <tr>
-            <th>#</th>
-            <th>Nimi</th>
-            <th>Ettevõte</th>
-            <th>Registrikood</th>
-            <th>KMKR</th>
-            <th>E-post</th>
-            <th>Arve e-post</th>
-            <th>Telefon</th>
-            <th>Tegevused</th>
+            <th scope="col">#</th>
+            <th scope="col">Nimi</th>
+            <th scope="col">Ettevõte</th>
+            <th scope="col">Registrikood</th>
+            <th scope="col">KMKR</th>
+            <th scope="col">E-post</th>
+            <th scope="col">Arve e-post</th>
+            <th scope="col">Telefon</th>
+            <th scope="col">Tegevused</th>
           </tr>
-          </thead>
+        </thead>
 
-          <tbody>
+        <tbody>
           <tr v-for="(customer, index) in customers" :key="customer.customerId">
             <td>{{ index + 1 }}</td>
             <td>{{ customer.name }}</td>
@@ -135,20 +122,20 @@ export default {
             <td>{{ customer.email }}</td>
             <td>{{ customer.invoiceEmail }}</td>
             <td>{{ customer.phone }}</td>
-            <td>
-              <router-link
-                  :to="`/customers/${customer.customerId}`"
-                  class="btn btn-outline-primary me-2"
+            <td class="text-nowrap">
+              <RouterLink
+                :to="`/customers/${customer.customerId}`"
+                class="btn btn-sm btn-outline-primary me-2"
               >
                 Vaata
-              </router-link>
-              <router-link
-                  :to="`/customers/${customer.customerId}/edit`"
-                  class="btn btn-outline-secondary me-2"
+              </RouterLink>
+              <RouterLink
+                :to="`/customers/${customer.customerId}/edit`"
+                class="btn btn-sm btn-outline-secondary me-2"
               >
                 Muuda
-              </router-link>
-              <button @click="deleteCustomer(customer.customerId)" class="btn btn-outline-dark">
+              </RouterLink>
+              <button class="btn btn-sm btn-outline-dark" @click="deleteCustomer(customer.customerId)">
                 Kustuta
               </button>
             </td>
@@ -156,82 +143,8 @@ export default {
           <tr v-if="customers.length === 0">
             <td colspan="9" class="text-center">Kliente ei leitud.</td>
           </tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
-
-<style scoped>
-.main-content {
-  flex: 1;
-  padding: 20px 40px;
-}
-
-.content-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.actions {
-  display: flex;
-  gap: 12px;
-}
-
-/* Otsinguväli + luubi nupp ühe tervikuna */
-.search-wrapper {
-  display: flex;
-  align-items: stretch;
-}
-
-.search-input {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-right: none;
-  border-radius: 4px 0 0 4px;
-}
-
-.search-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 10px;
-  border: 1px solid #ccc;
-  border-radius: 0 4px 4px 0;
-  background-color: #f0f0f0;
-  cursor: pointer;
-}
-
-.search-btn:hover {
-  background-color: #e0e0e0;
-}
-
-.error-message {
-  color: #c0392b;
-  margin-bottom: 12px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  font-size: 14px;
-}
-
-th {
-  background-color: #f9f9f9;
-}
-
-.text-center {
-  text-align: center;
-}
-</style>

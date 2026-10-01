@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex">
+  <div class="d-flex flex-column flex-md-row">
     <!-- Külgmenüü on kõigil lehtedel, aga ainult sisselogitud kasutajale (login lehel pole) -->
     <AppSidebar v-if="isLoggedIn" :role-name="roleName" @event-logout="logout" />
 
