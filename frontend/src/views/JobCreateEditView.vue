@@ -4,6 +4,7 @@ import NavigationService from '@/services/NavigationService.js'
 import JobService from '@/services/JobService.js'
 import CustomerService from '@/services/CustomerService.js'
 import VehicleService from '@/services/VehicleService.js'
+import SubcontractorService from '@/services/SubcontractorService.js'
 import DriverService from '@/services/DriverService.js'
 
 export default {
@@ -49,6 +50,11 @@ export default {
       this.job.vehicleId = null
       this.job.subcontractorId = null
     },
+
+    // Teise alltöövõtja valimisel eelmise alltöövõtja auto enam ei sobi
+    'job.subcontractorId'() {
+      this.job.vehicleId = null
+    },
   },
 
   data() {
@@ -86,6 +92,7 @@ export default {
       executionTypes: [],
       drivers: [],
       vehicles: [],
+      subcontractors: [],
     }
   },
   beforeMount() {
@@ -100,6 +107,7 @@ export default {
     this.getExecutionTypes()
     this.getDrivers()
     this.getVehicles()
+    this.getSubcontractors()
   },
   methods: {
     getCustomers() {
@@ -136,6 +144,16 @@ export default {
         })
         .catch(() => {
           this.errorMessage = 'Autode laadimine ebaõnnestus'
+        })
+    },
+
+    getSubcontractors() {
+      SubcontractorService.getSubcontractorsRequest()
+        .then((response) => {
+          this.subcontractors = response.data
+        })
+        .catch(() => {
+          this.errorMessage = 'Alltöövõtjate laadimine ebaõnnestus'
         })
     },
 
@@ -279,6 +297,21 @@ export default {
               <option :value="null">Vali juht</option>
               <option v-for="driver in drivers" :key="driver.driverId" :value="driver.driverId">
                 {{ driver.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Alltöövõtja valik: selle järgi näitame Auto rippmenüüs ainult tema autosid -->
+          <div v-if="job.executionType === 'SUBCONTRACTED'" class="col-md-6">
+            <label for="subcontractorId" class="form-label">Alltöövõtja</label>
+            <select id="subcontractorId" v-model="job.subcontractorId" class="form-select">
+              <option :value="null">Vali alltöövõtja</option>
+              <option
+                v-for="subcontractor in subcontractors"
+                :key="subcontractor.subcontractorId"
+                :value="subcontractor.subcontractorId"
+              >
+                {{ subcontractor.companyName }}
               </option>
             </select>
           </div>
