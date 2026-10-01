@@ -28,6 +28,11 @@ export default {
     return axios.post('/api/jobs', jobCreateRequestDto)
   },
 
+  putJobRequest(jobId, jobUpdateRequestDto) {
+    // Salvestame olemasoleva tellimuse muudetud andmed
+    return axios.put('/api/jobs/' + jobId, jobUpdateRequestDto)
+  },
+
   getJobRequest(jobId) {
     // Küsime backendilt ühe töö andmed
     return axios.get('/api/jobs/' + jobId)

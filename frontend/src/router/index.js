@@ -63,6 +63,13 @@ const router = createRouter({
       component: JobCreateEditView,
     },
 
+    // Olemasoleva tellimuse muutmine (sama vorm nagu loomisel)
+    {
+      path: '/jobs/:id/edit',
+      name: 'job-edit',
+      component: JobCreateEditView,
+    },
+
     // Ühe töö detailvaade, :id = töö ID (/jobs/new on täpsem rada, see läheb ette)
     {
       path: '/jobs/:id',
