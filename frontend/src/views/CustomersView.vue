@@ -37,8 +37,6 @@ export default {
 
   methods: {
     getCustomers() {
-      this.errorMessage = ''
-
       CustomerService.getCustomersRequest()
         .then((response) => this.handleGetCustomers(response))
         .catch((error) => this.handleGetCustomersErrorResponse(error))
@@ -53,17 +51,17 @@ export default {
       this.errorMessage = 'Klientide laadimine ebaõnnestus.'
     },
 
-    // goToAddCustomer() {
-    //   this.$router.push('/customers/new')
-    // },
-    //
-    // goToViewCustomer(customerId) {
-    //   this.$router.push('/customers/' + customerId)
-    // },
-    //
-    // goToEditCustomer(customerId) {
-    //   this.$router.push('/customers/' + customerId + '/edit')
-    // },
+    goToAddCustomer() {
+      this.$router.push('/customers/new')
+    },
+
+    goToViewCustomer(customerId) {
+      this.$router.push('/customers/' + customerId)
+    },
+
+    goToEditCustomer(customerId) {
+      this.$router.push('/customers/' + customerId + '/edit')
+    },
 
     deleteCustomer(customerId) {
       // kinnitusaken
@@ -128,25 +126,8 @@ export default {
 </script>
 
 <template>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <h2 class="brand">LIFTERTRANS</h2>
-      <nav>
-        <ul>
-          <li><router-link to="/">Esileht</router-link></li>
-          <li><router-link to="/calendar">Kalender</router-link></li>
-          <li><router-link to="/orders">Tellimused</router-link></li>
-          <li class="active"><router-link to="/customers">Kliendid</router-link></li>
-          <li><router-link to="/vechicles">Autod</router-link></li>
-          <li><router-link to="/drivers">juhid</router-link></li>
-          <li><router-link to="/reports">Aruanded</router-link></li>
-        </ul>
-      </nav>
-      <div class="logout">
-        <a href="#">Logi välja</a>
-      </div>
-    </aside>
-
+  <!-- Külgmenüü on nüüd App.vue-s (AppSidebar), siin ainult lehe sisu -->
+  <div>
     <main class="main-content">
       <header class="content-header">
         <h1>Kliendid</h1>
@@ -159,7 +140,7 @@ export default {
             class="search-input"
           />
 
-          <router-link to="/customers/new" class="btn btn-danger"> + Lisa klient </router-link>
+          <router-link to="/customers/new" class="btn btn-primary"> + Lisa klient </router-link>
         </div>
       </header>
 
@@ -189,16 +170,12 @@ export default {
               <td>{{ customer.email }}</td>
               <td>{{ customer.invoiceEmail }}</td>
               <td>{{ customer.phone }}</td>
-              <td class="actions-cell">
-                <router-link :to="`/customers/${customer.customerId}`"
-                             class="btn btn-danger"
+              <td>
+                <router-link :to="`/customers/${customer.customerId}`" class="btn btn-sm btn-outline-primary me-2"
                   >Vaata</router-link
                 >
-                <router-link :to="`/customers/${customer.customerId}/edit`"
-                  class="btn btn-outline-secondary me-2"
-                  >Muuda</router-link
-                >
-                <button class="btn btn-dark" @click="deleteCustomer(customer.customerId)">
+                <router-link :to="`/customers/${customer.customerId}/edit`" class="btn btn-sm btn-outline-secondary">Muuda</router-link>
+                <button @click="confirmDelete(customer)" class="btn-link text-danger">
                   Kustuta
                 </button>
               </td>
@@ -213,39 +190,7 @@ export default {
   </div>
 </template>
 
-<style>
-.app-layout {
-  display: flex;
-  min-height: 100vh;
-  font-family: sans-serif;
-}
-
-.sidebar {
-  width: 200px;
-  border-right: 1px solid #ccc;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  margin-bottom: 12px;
-}
-
-.sidebar li.active a {
-  font-weight: bold;
-  color: #000;
-}
-
-.sidebar .logout {
-  margin-top: auto;
-}
-
+<style scoped>
 .main-content {
   flex: 1;
   padding: 20px 40px;
@@ -266,6 +211,15 @@ export default {
 .search-input {
   padding: 6px 12px;
   border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-primary {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  text-decoration: none;
+  color: #000;
   border-radius: 4px;
 }
 
