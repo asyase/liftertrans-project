@@ -9,4 +9,9 @@ export default {
       },
     })
   },
+
+  deleteCustomerRequest(customerId) {
+    // Kustutame kliendi ID järgi
+    return axios.delete('/api/customers/' + customerId)
+  },
 }
