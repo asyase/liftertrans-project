@@ -19,16 +19,20 @@ public class JobDetailDto {
     private String executionType;
 
     // Klient
+    private Integer customerId;
     private String customerName;
     private String customerCompanyName;
     private String customerPhone;
     private String customerEmail;
 
     // Auto, juht või alltöövõtja (SUBCONTRACTED puhul juhti pole)
+    // id-d on vajalikud muutmise vormi jaoks (valikud eeltäidetakse id järgi)
     private Integer vehicleId;
     private String vehicleRegistrationNumber;
     private String vehicleName;
+    private Integer driverId;
     private String driverName;
+    private Integer subcontractorId;
     private String subcontractorName;
 
     // Aadressid (CRANE_ONLY puhul ainult serviceAddress)

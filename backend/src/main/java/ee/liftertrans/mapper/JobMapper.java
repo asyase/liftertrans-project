@@ -40,6 +40,7 @@ public interface JobMapper {
     // Samanimelised väljad (status, pickupAddress jne) seob MapStruct ise,
     // siia kirjutan ainult need, mis tulevad kliendi, auto, juhi või alltöövõtja küljest
     @Mapping(source = "id", target = "jobId")
+    @Mapping(source = "customer.id", target = "customerId")
     @Mapping(source = "customer.name", target = "customerName")
     @Mapping(source = "customer.companyName", target = "customerCompanyName")
     @Mapping(source = "customer.phone", target = "customerPhone")
@@ -47,7 +48,9 @@ public interface JobMapper {
     @Mapping(source = "vehicle.id", target = "vehicleId")
     @Mapping(source = "vehicle.registrationNumber", target = "vehicleRegistrationNumber")
     @Mapping(source = "vehicle.name", target = "vehicleName")
+    @Mapping(source = "driver.id", target = "driverId")
     @Mapping(source = "driver.name", target = "driverName")
+    @Mapping(source = "subcontractor.id", target = "subcontractorId")
     @Mapping(source = "subcontractor.companyName", target = "subcontractorName")
     JobDetailDto toJobDetailDto(Job job);
 

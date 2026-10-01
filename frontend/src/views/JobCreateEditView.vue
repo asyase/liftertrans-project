@@ -46,6 +46,10 @@ export default {
     // Teostamise viisi vahetamisel tühjendame eelmise viisi valikud,
     // muidu jääks nt peidetud juht alles ja backend lükkaks töö tagasi
     'job.executionType'() {
+      // Eeltäitmise ajal ei tühjenda (muidu kaoks laaditud juht/auto/alltöövõtja)
+      if (this.isPrefilling) {
+        return
+      }
       this.job.driverId = null
       this.job.vehicleId = null
       this.job.subcontractorId = null
@@ -53,6 +57,9 @@ export default {
 
     // Teise alltöövõtja valimisel eelmise alltöövõtja auto enam ei sobi
     'job.subcontractorId'() {
+      if (this.isPrefilling) {
+        return
+      }
       this.job.vehicleId = null
     },
   },
@@ -86,6 +93,15 @@ export default {
       errorMessage: '',
       isLoading: false,
 
+      // Muutmise režiim: /jobs/:id/edit. Loomise režiimis jobId on null.
+      jobId: null,
+      isEditMode: false,
+      // Olemasoleva tellimuse staatus (ainult muutmisrežiimis kuvatakse)
+      jobStatus: '',
+      successMessage: '',
+      // Eeltäitmise ajal ei tohi watcher'id valikuid tühjendada
+      isPrefilling: false,
+
       // Täidetakse backendist (beforeMount)
       customers: [],
       jobTypes: [],
@@ -108,6 +124,13 @@ export default {
     this.getDrivers()
     this.getVehicles()
     this.getSubcontractors()
+
+    // Kui URL-is on id (/jobs/:id/edit), siis oleme muutmise režiimis — laadime olemasoleva töö
+    if (this.$route.params.id) {
+      this.isEditMode = true
+      this.jobId = this.$route.params.id
+      this.getJob()
+    }
   },
   methods: {
     getCustomers() {
@@ -167,9 +190,50 @@ export default {
         })
     },
 
-    createJob() {
-      // Kustutame eelmise veateate
+    getJob() {
+      JobService.getJobRequest(this.jobId)
+        .then((response) => this.prefillForm(response.data))
+        .catch(() => {
+          this.errorMessage = 'Tellimuse laadimine ebaõnnestus'
+        })
+    },
+
+    prefillForm(job) {
+      // Watcher'id ei tohi eeltäitmise ajal valikuid tühjendada
+      this.isPrefilling = true
+
+      this.jobStatus = job.status
+
+      this.job = {
+        customerId: job.customerId,
+        jobType: job.jobType,
+        executionType: job.executionType,
+        vehicleId: job.vehicleId,
+        driverId: job.driverId,
+        subcontractorId: job.subcontractorId,
+        pickupAddress: job.pickupAddress ?? '',
+        deliveryAddress: job.deliveryAddress ?? '',
+        serviceAddress: job.serviceAddress ?? '',
+        receiverName: job.receiverName ?? '',
+        receiverPhone: job.receiverPhone ?? '',
+        // Backend annab aja ISO Instant-ina, datetime-local ootab kohalikku "YYYY-MM-DDTHH:mm"
+        plannedStartTime: this.toLocalInput(job.plannedStartTime),
+        plannedEndTime: this.toLocalInput(job.plannedEndTime),
+        estimatedKm: job.estimatedKm,
+        estimatedHours: job.estimatedHours,
+        notes: job.notes ?? '',
+      }
+
+      // Lubame watcher'id jälle alles pärast seda, kui muudatused on rakendunud
+      this.$nextTick(() => {
+        this.isPrefilling = false
+      })
+    },
+
+    saveJob() {
+      // Kustutame eelmised teated
       this.errorMessage = ''
+      this.successMessage = ''
 
       // Alustame laadimist
       this.isLoading = true
@@ -186,23 +250,84 @@ export default {
         estimatedKm: this.job.estimatedKm === '' ? null : this.job.estimatedKm,
       }
 
+      if (this.isEditMode) {
+        this.saveChanges(jobRequest)
+      } else {
+        this.createNewJob(jobRequest)
+      }
+    },
+
+    createNewJob(jobRequest) {
       JobService.postJobRequest(jobRequest)
         .then((response) => {
-          const jobId = response.data.jobId
+          // Uus töö luuakse DRAFT staatuses; sama vaade muutub muutmisrežiimiks
+          this.jobId = response.data.jobId
+          this.isEditMode = true
+          this.jobStatus = response.data.status
+          this.successMessage = `Tellimus #${this.jobId} loodud`
 
-          // Muutmise vaadet (/jobs/:id/edit) veel pole, seega suuname tellimuste nimekirja.
-          // Teate anname kaasa URL-i query parameetrina, JobsView loeb selle beforeMount-is välja.
-          this.$router.push({
-            path: '/jobs',
-            query: { successMessage: `Tellimus #${jobId} loodud` },
-          })
+          // Uuendame URL-i, et lehe värskendamine töötaks (/jobs/:id/edit)
+          this.$router.replace({ name: 'job-edit', params: { id: this.jobId } })
         })
         .catch((error) => {
-          this.errorMessage = error.response?.data?.message || 'Töö loomine ebaõnnestus'
+          this.errorMessage = error.response?.data?.message || 'Tellimuse salvestamine ebaõnnestus'
         })
         .finally(() => {
           this.isLoading = false
         })
+    },
+
+    saveChanges(jobRequest) {
+      JobService.putJobRequest(this.jobId, jobRequest)
+        .then((response) => {
+          this.jobStatus = response.data.status
+          this.successMessage = `Tellimus #${this.jobId} uuendatud`
+        })
+        .catch((error) => {
+          this.errorMessage = error.response?.data?.message || 'Tellimuse salvestamine ebaõnnestus'
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
+    confirmJob() {
+      this.errorMessage = ''
+      this.successMessage = ''
+      this.isLoading = true
+
+      // Kinnita: DRAFT → PLANNED
+      JobService.confirmJobRequest(this.jobId)
+        .then((response) => {
+          this.jobStatus = response.data.status
+          this.successMessage = `Tellimus #${this.jobId} kinnitatud`
+        })
+        .catch((error) => {
+          this.errorMessage = error.response?.data?.message || 'Kinnitamine ebaõnnestus'
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
+    // ISO Instant → datetime-local väärtus kohalikus ajas
+    toLocalInput(iso) {
+      if (!iso) {
+        return ''
+      }
+      const date = new Date(iso)
+      const pad = (number) => String(number).padStart(2, '0')
+      return (
+        date.getFullYear() +
+        '-' +
+        pad(date.getMonth() + 1) +
+        '-' +
+        pad(date.getDate()) +
+        'T' +
+        pad(date.getHours()) +
+        ':' +
+        pad(date.getMinutes())
+      )
     },
 
     toIsoString(dateTimeLocal) {
@@ -217,7 +342,17 @@ export default {
 </script>
 <template>
   <div class="container pb-5" style="max-width: 960px">
-    <h1 class="mb-4">Lisa uus tellimus</h1>
+    <h1 class="mb-2">{{ isEditMode ? 'Muuda tellimust' : 'Lisa uus tellimus' }}</h1>
+
+    <!-- Tellimuse number ja staatus näidatakse ainult muutmisrežiimis -->
+    <p v-if="isEditMode" class="text-body-secondary mb-4">
+      Tellimus #{{ jobId }} · Staatus: <strong>{{ jobStatus }}</strong>
+    </p>
+
+    <!-- Õnnestumise teade -->
+    <div v-if="successMessage" class="alert alert-success" role="alert">
+      {{ successMessage }}
+    </div>
 
     <!-- Veateade -->
     <div v-if="errorMessage" class="alert alert-danger" role="alert">
@@ -440,11 +575,23 @@ export default {
       </div>
     </div>
 
-    <div class="d-flex gap-2 justify-content-end">
-      <RouterLink :to="{ name: 'jobsRoute' }" class="btn btn-outline-secondary">Tühista</RouterLink>
-      <button @click="createJob" :disabled="isLoading" class="btn btn-primary px-4">
-        Salvesta
+    <div class="d-flex flex-wrap gap-2 justify-content-end">
+      <!-- Salvesta (loomisel) / Salvesta muudatused (muutmisel) -->
+      <button @click="saveJob" :disabled="isLoading" class="btn btn-primary px-4">
+        {{ isEditMode ? 'Salvesta muudatused' : 'Salvesta' }}
       </button>
+
+      <!-- Kinnita: ainult mustandi puhul (DRAFT → PLANNED) -->
+      <button
+        v-if="isEditMode && jobStatus === 'DRAFT'"
+        @click="confirmJob"
+        :disabled="isLoading"
+        class="btn btn-success px-4"
+      >
+        Kinnita
+      </button>
+
+      <RouterLink :to="{ name: 'jobsRoute' }" class="btn btn-outline-secondary">Tühista</RouterLink>
     </div>
   </div>
 </template>
