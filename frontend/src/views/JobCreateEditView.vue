@@ -96,6 +96,9 @@ export default {
       // Muutmise režiim: /jobs/:id/edit. Loomise režiimis jobId on null.
       jobId: null,
       isEditMode: false,
+      // Olemasoleva tellimuse staatus (ainult muutmisrežiimis kuvatakse)
+      jobStatus: '',
+      successMessage: '',
       // Eeltäitmise ajal ei tohi watcher'id valikuid tühjendada
       isPrefilling: false,
 
@@ -199,6 +202,8 @@ export default {
       // Watcher'id ei tohi eeltäitmise ajal valikuid tühjendada
       this.isPrefilling = true
 
+      this.jobStatus = job.status
+
       this.job = {
         customerId: job.customerId,
         jobType: job.jobType,
@@ -226,8 +231,9 @@ export default {
     },
 
     saveJob() {
-      // Kustutame eelmise veateate
+      // Kustutame eelmised teated
       this.errorMessage = ''
+      this.successMessage = ''
 
       // Alustame laadimist
       this.isLoading = true
@@ -244,25 +250,60 @@ export default {
         estimatedKm: this.job.estimatedKm === '' ? null : this.job.estimatedKm,
       }
 
-      // Muutmine → PUT, loomine → POST
-      const request = this.isEditMode
-        ? JobService.putJobRequest(this.jobId, jobRequest)
-        : JobService.postJobRequest(jobRequest)
+      if (this.isEditMode) {
+        this.saveChanges(jobRequest)
+      } else {
+        this.createNewJob(jobRequest)
+      }
+    },
 
-      request
+    createNewJob(jobRequest) {
+      JobService.postJobRequest(jobRequest)
         .then((response) => {
-          const jobId = this.isEditMode ? this.jobId : response.data.jobId
-          const successMessage = this.isEditMode
-            ? `Tellimus #${jobId} uuendatud`
-            : `Tellimus #${jobId} loodud`
+          // Uus töö luuakse DRAFT staatuses; sama vaade muutub muutmisrežiimiks
+          this.jobId = response.data.jobId
+          this.isEditMode = true
+          this.jobStatus = response.data.status
+          this.successMessage = `Tellimus #${this.jobId} loodud`
 
-          this.$router.push({
-            path: '/jobs',
-            query: { successMessage },
-          })
+          // Uuendame URL-i, et lehe värskendamine töötaks (/jobs/:id/edit)
+          this.$router.replace({ name: 'job-edit', params: { id: this.jobId } })
         })
         .catch((error) => {
           this.errorMessage = error.response?.data?.message || 'Tellimuse salvestamine ebaõnnestus'
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
+    saveChanges(jobRequest) {
+      JobService.putJobRequest(this.jobId, jobRequest)
+        .then((response) => {
+          this.jobStatus = response.data.status
+          this.successMessage = `Tellimus #${this.jobId} uuendatud`
+        })
+        .catch((error) => {
+          this.errorMessage = error.response?.data?.message || 'Tellimuse salvestamine ebaõnnestus'
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
+    confirmJob() {
+      this.errorMessage = ''
+      this.successMessage = ''
+      this.isLoading = true
+
+      // Kinnita: DRAFT → PLANNED
+      JobService.confirmJobRequest(this.jobId)
+        .then((response) => {
+          this.jobStatus = response.data.status
+          this.successMessage = `Tellimus #${this.jobId} kinnitatud`
+        })
+        .catch((error) => {
+          this.errorMessage = error.response?.data?.message || 'Kinnitamine ebaõnnestus'
         })
         .finally(() => {
           this.isLoading = false
@@ -301,7 +342,17 @@ export default {
 </script>
 <template>
   <div class="container pb-5" style="max-width: 960px">
-    <h1 class="mb-4">{{ isEditMode ? 'Muuda tellimust' : 'Lisa uus tellimus' }}</h1>
+    <h1 class="mb-2">{{ isEditMode ? 'Muuda tellimust' : 'Lisa uus tellimus' }}</h1>
+
+    <!-- Tellimuse number ja staatus näidatakse ainult muutmisrežiimis -->
+    <p v-if="isEditMode" class="text-body-secondary mb-4">
+      Tellimus #{{ jobId }} · Staatus: <strong>{{ jobStatus }}</strong>
+    </p>
+
+    <!-- Õnnestumise teade -->
+    <div v-if="successMessage" class="alert alert-success" role="alert">
+      {{ successMessage }}
+    </div>
 
     <!-- Veateade -->
     <div v-if="errorMessage" class="alert alert-danger" role="alert">
@@ -524,11 +575,23 @@ export default {
       </div>
     </div>
 
-    <div class="d-flex gap-2 justify-content-end">
-      <RouterLink :to="{ name: 'jobsRoute' }" class="btn btn-outline-secondary">Tühista</RouterLink>
+    <div class="d-flex flex-wrap gap-2 justify-content-end">
+      <!-- Salvesta (loomisel) / Salvesta muudatused (muutmisel) -->
       <button @click="saveJob" :disabled="isLoading" class="btn btn-primary px-4">
-        Salvesta
+        {{ isEditMode ? 'Salvesta muudatused' : 'Salvesta' }}
       </button>
+
+      <!-- Kinnita: ainult mustandi puhul (DRAFT → PLANNED) -->
+      <button
+        v-if="isEditMode && jobStatus === 'DRAFT'"
+        @click="confirmJob"
+        :disabled="isLoading"
+        class="btn btn-success px-4"
+      >
+        Kinnita
+      </button>
+
+      <RouterLink :to="{ name: 'jobsRoute' }" class="btn btn-outline-secondary">Tühista</RouterLink>
     </div>
   </div>
 </template>

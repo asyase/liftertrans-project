@@ -190,6 +190,37 @@ public class JobController {
         return jobService.updateJob(jobId, jobUpdateRequestDto);
     }
 
+    @PatchMapping("/jobs/{jobId}/confirm")
+    @Operation(
+            summary = "Tellimuse kinnitamine: DRAFT → PLANNED"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tellimus on kinnitatud (PLANNED)"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Tellimus ei ole DRAFT staatuses",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "INCORRECT_JOB_STATUS",
+                                    value = """
+                                            {
+                                              "message": "status: töö staatus on PLANNED, oodati DRAFT",
+                                              "errorCode": "INCORRECT_JOB_STATUS"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Tellimust ei leitud",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            )
+    })
+    public JobDetailDto confirmJob(@PathVariable Integer jobId) {
+        return jobService.confirmJob(jobId);
+    }
+
     @GetMapping("/drivers/{driverId}/jobs")
     @Operation(summary = "Juhi töölaud: juhile määratud tööd staatusega PLANNED ja IN_PROGRESS")
     @ApiResponses(value = {

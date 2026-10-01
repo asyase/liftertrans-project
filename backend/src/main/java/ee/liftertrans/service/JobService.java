@@ -274,6 +274,22 @@ public class JobService {
     }
 
 
+    @Transactional
+    public JobDetailDto confirmJob(Integer jobId) {
+
+        Job job = getValidJobBy(jobId);
+
+        // Kinnitada saab ainult mustandit (DRAFT -> PLANNED)
+        validateJobStatus(job, "DRAFT");
+
+        job.setStatus("PLANNED");
+        job.setUpdatedAt(Instant.now());
+        jobRepository.save(job);
+
+        return jobMapper.toJobDetailDto(job);
+    }
+
+
     private void validateJobType(JobRequest request) {
 
         String jobType = request.getJobType();

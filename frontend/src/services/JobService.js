@@ -33,6 +33,11 @@ export default {
     return axios.put('/api/jobs/' + jobId, jobUpdateRequestDto)
   },
 
+  confirmJobRequest(jobId) {
+    // Kinnitame tellimuse: DRAFT → PLANNED
+    return axios.patch('/api/jobs/' + jobId + '/confirm')
+  },
+
   getJobRequest(jobId) {
     // Küsime backendilt ühe töö andmed
     return axios.get('/api/jobs/' + jobId)
