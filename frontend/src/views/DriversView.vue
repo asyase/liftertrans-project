@@ -3,11 +3,11 @@ import SessionStorageService from '@/services/SessionStorageService.js'
 import NavigationService from '@/services/NavigationService.js'
 import DriverService from '@/services/DriverService.js'
 import axios from 'axios'
-import { PhMagnifyingGlass } from '@phosphor-icons/vue'
+import SearchBar from '@/components/SearchBar.vue'
 
 export default {
   name: 'DriversView',
-  components: { PhMagnifyingGlass },
+  components: { SearchBar },
 
   // Lehe avamisel laadime tööd backendist
   beforeMount() {
@@ -53,13 +53,13 @@ export default {
       DriverService.getDriversRequest()
 
         .then((response) => this.handleGetDrivers(response))
-        .catch((error) => this.handleGetDriversErrorResponse(error))
+        .catch(() => this.handleGetDriversErrorResponse())
     },
 
     handleGetDrivers(response) {
       this.drivers = response.data
     },
-    handleGetDriversErrorResponse(error) {
+    handleGetDriversErrorResponse() {
       this.errorMessage = 'Juhtide laadimine ebaõnnestus.'
     },
 
@@ -99,66 +99,61 @@ export default {
       {{ successMessage}}
     </div>
 
-    <h1>Juhid</h1>
+    <h1 class="mb-4">Juhid</h1>
 
-    <div class="row mb-3">
-      <div class="col-md-4">
-        <input
-          v-model="searchText"
-          type="text"
-          class="search-input"
-          placeholder="Otsi juhti"
-          @keyup.enter="applyDriversSearch"
-        />
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <SearchBar
+        v-model="searchText"
+        placeholder="Otsi juhti"
+        @search="applyDriversSearch"
+      />
 
-        <button type="button" class="search-btn" @click="applyDriversSearch" title="Otsi">
-          <PhMagnifyingGlass :size="22" />
-        </button>
-      </div>
-      <div class="col-auto">
-        <RouterLink :to="{ name: 'driver-create' }" class="btn btn-primary ms-2"
-          >+ Lisa juht</RouterLink
-        >
-      </div>
+      <RouterLink :to="{ name: 'driver-create' }" class="btn btn-primary">+ Lisa juht</RouterLink>
     </div>
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th scope="col">Nimi</th>
-          <th scope="col">Telefon</th>
-          <th scope="col">E-post</th>
-          <th scope="col">Staatus</th>
-          <th scope="col">Tegevused</th>
-        </tr>
-      </thead>
 
-      <tbody>
-        <tr v-for="driver in filteredDrivers" :key="driver.driverId">
-          <td>{{ driver.name }}</td>
-          <td>{{ driver.phone }}</td>
-          <td>{{ driver.email }}</td>
-          <td>{{ driver.active ? 'Aktiivne' : 'Mitteaktiivne' }}</td>
-          <td>
-            <RouterLink
-              :to="{ name: 'driver-detail', params: { id: driver.driverId } }"
-              class="btn btn-sm btn-outline-primary me-2"
-            >
-              Vaata
-            </RouterLink>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th scope="col">Nimi</th>
+            <th scope="col">Telefon</th>
+            <th scope="col">E-post</th>
+            <th scope="col">Staatus</th>
+            <th scope="col">Tegevused</th>
+          </tr>
+        </thead>
 
-            <RouterLink
-              :to="{ name: 'driver-edit', params: { id: driver.driverId } }"
-              class="btn btn-sm btn-outline-secondary me-2"
-            >
-              Muuda
-            </RouterLink>
+        <tbody>
+          <tr v-for="driver in filteredDrivers" :key="driver.driverId">
+            <td>{{ driver.name }}</td>
+            <td>{{ driver.phone }}</td>
+            <td>{{ driver.email }}</td>
+            <td>{{ driver.active ? 'Aktiivne' : 'Mitteaktiivne' }}</td>
+            <td class="text-nowrap">
+              <RouterLink
+                :to="{ name: 'driver-detail', params: { id: driver.driverId } }"
+                class="btn btn-sm btn-outline-primary me-2"
+              >
+                Vaata
+              </RouterLink>
 
-            <button class="btn btn-outline-dark btn-sm me-2" @click="deleteDriver(driver.driverId)">
-              Kustuta
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              <RouterLink
+                :to="{ name: 'driver-edit', params: { id: driver.driverId } }"
+                class="btn btn-sm btn-outline-secondary me-2"
+              >
+                Muuda
+              </RouterLink>
+
+              <button
+                class="btn btn-sm btn-outline-dark"
+                @click="deleteDriver(driver.driverId)"
+              >
+                Kustuta
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>

@@ -62,7 +62,8 @@ export default {
 </script>
 
 <template>
-  <table class="table table-hover">
+  <div class="table-responsive">
+  <table class="table table-hover align-middle">
     <thead>
       <tr>
         <th scope="col">Nr</th>
@@ -132,4 +133,5 @@ export default {
       </tr>
     </tbody>
   </table>
+  </div>
 </template>
