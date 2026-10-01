@@ -27,4 +27,9 @@ export default {
     // Saadame uue töö andmed backendile
     return axios.post('/api/jobs', jobCreateRequestDto)
   },
+
+  getJobRequest(jobId) {
+    // Küsime backendilt ühe töö andmed
+    return axios.get('/api/jobs/' + jobId)
+  },
 }

@@ -2,9 +2,11 @@ package ee.liftertrans.service;
 
 import ee.liftertrans.dto.JobCreateRequestDto;
 import ee.liftertrans.dto.JobCreateResponseDto;
+import ee.liftertrans.dto.JobDetailDto;
 import ee.liftertrans.dto.JobDto;
 import ee.liftertrans.dto.SelectOptionDto;
 import ee.liftertrans.infrastructure.exception.IncorrectInputException;
+import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
 import ee.liftertrans.mapper.JobMapper;
 import ee.liftertrans.persistence.entity.Job;
 import ee.liftertrans.persistence.enums.ExecutionType;
@@ -24,6 +26,9 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
     private final DriverService driverService;
+    private final VehicleService vehicleService;
+    // Kliendi leidmiseks customerId järgi (sama moodi nagu juht ja sõiduk)
+    private final CustomerService customerService;
 
 
     public List<JobDto> getJobs() {
@@ -37,6 +42,21 @@ public class JobService {
         return jobDtos;
     }
 
+
+    public JobDetailDto getJob(Integer jobId) {
+
+        // Leiame töö andmebaasist (kui pole, siis 404)
+        Job job = getValidJobBy(jobId);
+
+        // Muudame Entity DTO-ks
+        return jobMapper.toJobDetailDto(job);
+    }
+
+    public Job getValidJobBy(Integer jobId) {
+        // Otsime töö ID järgi, kui ei leia, siis 404
+        return jobRepository.findById(jobId)
+                .orElseThrow(() -> new PrimaryKeyNotFoundException("jobId", jobId));
+    }
 
     public List<SelectOptionDto> getJobTypes() {
 
@@ -100,11 +120,15 @@ public class JobService {
         job.setStatus("DRAFT");
 
 
-        // TODO: leia Customer customerId järgi
-        // job.setCustomer(customer);
+        // VIGA OLI: siin oli ainult TODO, klienti tööle ei pandud ja salvestamine kukkus 500-ga,
+        // sest job.customer_id on andmebaasis NOT NULL.
+        // Klient on kohustuslik — tühja customerId püüab kinni juba @NotNull DTO-s.
+        job.setCustomer(customerService.getValidCustomerBy(request.getCustomerId()));
 
-        // TODO: kui vehicleId != null, leia Vehicle
-        // job.setVehicle(vehicle);
+        // Sõiduk (ainult kui on valitud)
+        if (request.getVehicleId() != null) {
+            job.setVehicle(vehicleService.getValidVehicleBy(request.getVehicleId()));
+        }
 
         // Juht (ainult kui on valitud)
         if (request.getDriverId() != null) {

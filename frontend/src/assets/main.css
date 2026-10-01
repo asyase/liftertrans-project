@@ -1,16 +1,120 @@
+/* LIFTERTRANS brändi värvid (logo punane gradient + valge) */
+:root {
+  --lt-red: #b3201f;
+  --lt-red-dark: #7d1414;
+  --lt-red-light: #d8372f;
+  --lt-red-rgb: 179, 32, 31;
+  --lt-gradient: linear-gradient(
+    90deg,
+    var(--lt-red-dark) 0%,
+    var(--lt-red) 55%,
+    var(--lt-red-light) 100%
+  );
+  --lt-bg: #f4f4f5;
+  --lt-heading-font: 'Oswald', 'Arial Narrow', sans-serif;
+
+  /* Bootstrapi värvid brändi järgi */
+  --bs-primary: var(--lt-red);
+  --bs-primary-rgb: var(--lt-red-rgb);
+  --bs-link-color: var(--lt-red);
+  --bs-link-color-rgb: var(--lt-red-rgb);
+  --bs-link-hover-color: var(--lt-red-dark);
+  --bs-link-hover-color-rgb: 125, 20, 20;
+  --bs-focus-ring-color: rgba(var(--lt-red-rgb), 0.25);
+}
+
+/* Hall ainult lehe taustal — kaardid ja väljad jäävad valgeks */
+body {
+  background-color: var(--lt-bg);
+}
+
 #app {
   font-weight: normal;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+h1,
+h2,
+h3,
+h4,
+h5,
+.navbar-brand {
+  font-family: var(--lt-heading-font);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
+a {
+  text-decoration: none;
+  transition: 0.2s;
+}
 
+/* Nupud */
+.btn-primary {
+  --bs-btn-bg: var(--lt-red);
+  --bs-btn-border-color: var(--lt-red);
+  --bs-btn-hover-bg: var(--lt-red-dark);
+  --bs-btn-hover-border-color: var(--lt-red-dark);
+  --bs-btn-active-bg: var(--lt-red-dark);
+  --bs-btn-active-border-color: var(--lt-red-dark);
+  --bs-btn-disabled-bg: var(--lt-red);
+  --bs-btn-disabled-border-color: var(--lt-red);
+  --bs-btn-focus-shadow-rgb: var(--lt-red-rgb);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--lt-red);
+  --bs-btn-border-color: var(--lt-red);
+  --bs-btn-hover-bg: var(--lt-red);
+  --bs-btn-hover-border-color: var(--lt-red);
+  --bs-btn-active-bg: var(--lt-red-dark);
+  --bs-btn-active-border-color: var(--lt-red-dark);
+  --bs-btn-focus-shadow-rgb: var(--lt-red-rgb);
+}
+
+/* Vormiväljade fookus ja valitud raadionupud/linnukesed brändi värviga */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: rgba(var(--lt-red-rgb), 0.6);
+  box-shadow: 0 0 0 0.25rem rgba(var(--lt-red-rgb), 0.2);
+}
+
+.form-check-input:checked {
+  background-color: var(--lt-red);
+  border-color: var(--lt-red);
+}
+
+/* Päis logo gradiendiga */
+.lt-navbar {
+  background: var(--lt-gradient);
+}
+
+.lt-navbar .navbar-brand {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.lt-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.lt-navbar .nav-link:hover,
+.lt-navbar .nav-link.router-link-exact-active {
+  color: #fff;
+}
+
+/* Vormi jaotise kaart: punane triip vasakul nagu logo taust */
+.lt-section {
+  border: 0;
+  border-left: 4px solid var(--lt-red);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.lt-section .card-title {
+  color: var(--lt-red-dark);
+  font-size: 1.1rem;
+}
 
 .pointer {
   cursor: pointer;
@@ -19,11 +123,3 @@ a,
 .text-pointer-underlined:hover {
   text-decoration: underline;
 }
-
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-

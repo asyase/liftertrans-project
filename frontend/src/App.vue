@@ -1,25 +1,56 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3 mb-3">
-    <RouterLink class="navbar-brand" to="/">Minu Projekt</RouterLink>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navMenu"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-center" id="navMenu">
-      <div class="navbar-nav">
-        <RouterLink class="nav-link" to="/">Home</RouterLink>
-        <RouterLink class="nav-link" to="/test">Test</RouterLink>
-      </div>
-    </div>
-  </nav>
+  <div class="d-flex">
+    <!-- Külgmenüü on kõigil lehtedel, aga ainult sisselogitud kasutajale (login lehel pole) -->
+    <AppSidebar v-if="isLoggedIn" :role-name="roleName" @event-logout="logout" />
 
-  <RouterView />
+    <main class="flex-grow-1 py-4 lt-main">
+      <!-- LoginView saadab pärast sisselogimist event-user-logged-in, siis uuendame menüü -->
+      <RouterView @event-user-logged-in="updateNavMenu" />
+    </main>
+  </div>
 </template>
 
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
+<script>
+import AppSidebar from '@/components/AppSidebar.vue'
+
+export default {
+  name: 'App',
+
+  components: {
+    AppSidebar,
+  },
+
+  data() {
+    return {
+      // Loeme rolli kohe sessionStorage-ist, et lehe värskendamisel menüü ei kaoks
+      roleName: sessionStorage.getItem('roleName'),
+    }
+  },
+
+  computed: {
+    isLoggedIn() {
+      return this.roleName !== null
+    },
+  },
+
+  methods: {
+    updateNavMenu() {
+      this.roleName = sessionStorage.getItem('roleName')
+    },
+
+    // Kustutame sisselogitud kasutaja andmed, uuendame menüü ja suuname sisselogimise lehele
+    logout() {
+      sessionStorage.clear()
+      this.updateNavMenu()
+      this.$router.push('/login')
+    },
+  },
+}
 </script>
+
+<style>
+/* Sisu võtab ülejäänud laiuse; min-width: 0, et laiad tabelid ei lükkaks lehte laiemaks */
+.lt-main {
+  min-width: 0;
+}
+</style>

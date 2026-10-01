@@ -1,4 +1,5 @@
 <script>
+import SessionStorageService from '@/services/SessionStorageService.js'
 import JobsTable from '@/components/job/JobsTable.vue'
 import JobService from '@/services/JobService.js'
 import NavigationService from '@/services/NavigationService.js'
@@ -11,6 +12,16 @@ export default {
   },
 
   beforeMount() {
+    // Leht on ainult ADMIN-ile — teised suuname lehele "õigused puuduvad"
+    if (!SessionStorageService.userIsAdmin()) {
+      NavigationService.navigateToNotAuthorizedView()
+      return
+    }
+
+    // Pärast uue tellimuse loomist tuleb teade URL-i query parameetrina (?successMessage=...).
+    // Kui lehele tullakse muul moel, siis teadet pole → tühi string.
+    this.successMessage = this.$route.query.successMessage ?? ''
+
     // Lehe avamisel laadime tööd backendist
     this.getJobs()
   },
@@ -19,6 +30,7 @@ export default {
     return {
       jobs: [],
 
+      successMessage: '',
       errorMessage: '',
 
       filters: {
@@ -77,18 +89,6 @@ export default {
       // Dropdowni või kuupäeva muutmisel laadime andmed uuesti
       this.getJobs()
     },
-
-    handleJobViewClick(jobId) {
-      NavigationService.navigateToJobDetailView(jobId)
-    },
-
-    handleJobEditClick(jobId) {
-      NavigationService.navigateToJobEditView(jobId)
-    },
-
-    handleAddJobClick() {
-      NavigationService.navigateToJobCreateView()
-    },
   },
 }
 </script>
@@ -101,8 +101,16 @@ export default {
       </div>
 
       <div class="col text-end">
-        <button @click="handleAddJobClick" class="btn btn-primary">+ Lisa uus tellimus</button>
+        <RouterLink :to="{ name: 'job-create' }" class="btn btn-primary">
+          + Lisa uus tellimus
+        </RouterLink>
       </div>
+    </div>
+
+    <!-- Õnnestumise teade (nt pärast uue tellimuse loomist) -->
+    <div v-if="successMessage" class="alert alert-success alert-dismissible" role="alert">
+      {{ successMessage }}
+      <button type="button" class="btn-close" @click="successMessage = ''"></button>
     </div>
 
     <!-- Kiirfiltrid -->
@@ -153,10 +161,6 @@ export default {
     </div>
 
     <!-- Tööde tabel -->
-    <JobsTable
-      :jobs="jobs"
-      @event-job-view-click="handleJobViewClick"
-      @event-job-edit-click="handleJobEditClick"
-    />
+    <JobsTable :jobs="jobs" />
   </div>
 </template>
