@@ -51,17 +51,17 @@ export default {
       this.errorMessage = 'Klientide laadimine ebaõnnestus.'
     },
 
-    goToAddCustomer() {
-      this.$router.push('/customers/new')
-    },
-
-    goToViewCustomer(customerId) {
-      this.$router.push('/customers/' + customerId)
-    },
-
-    goToEditCustomer(customerId) {
-      this.$router.push('/customers/' + customerId + '/edit')
-    },
+    // goToAddCustomer() {
+    //   this.$router.push('/customers/new')
+    // },
+    //
+    // goToViewCustomer(customerId) {
+    //   this.$router.push('/customers/' + customerId)
+    // },
+    //
+    // goToEditCustomer(customerId) {
+    //   this.$router.push('/customers/' + customerId + '/edit')
+    // },
 
     deleteCustomer(customerId) {
       // kinnitusaken
@@ -171,13 +171,17 @@ export default {
               <td>{{ customer.invoiceEmail }}</td>
               <td>{{ customer.phone }}</td>
               <td>
-                <router-link :to="`/customers/${customer.customerId}`" class="btn btn-sm btn-outline-primary me-2"
-                  >Vaata</router-link
-                >
-                <router-link :to="`/customers/${customer.customerId}/edit`" class="btn btn-sm btn-outline-secondary">Muuda</router-link>
-                <button @click="confirmDelete(customer)" class="btn-link text-danger">
-                  Kustuta
-                </button>
+                <router-link
+                  :to="`/customers/${customer.customerId}`"
+                  class="btn btn-sm btn-outline-primary me-2"
+                  >Vaata
+                </router-link>
+                <router-link
+                  :to="`/customers/${customer.customerId}/edit`"
+                  class="btn btn-sm btn-outline-secondary"
+                  >Muuda
+                </router-link>
+                <button @click="confirmDelete(customer)" class="btn btn-primary">Kustuta</button>
               </td>
             </tr>
             <tr v-if="customers.length === 0">
