@@ -37,6 +37,8 @@ export default {
 
   methods: {
     getCustomers() {
+      this.errorMessage = ''
+
       CustomerService.getCustomersRequest()
         .then((response) => this.handleGetCustomers(response))
         .catch((error) => this.handleGetCustomersErrorResponse(error))
