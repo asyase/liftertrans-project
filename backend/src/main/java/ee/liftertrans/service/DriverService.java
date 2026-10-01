@@ -3,6 +3,8 @@ package ee.liftertrans.service;
 
 import ee.liftertrans.dto.DriverDto;
 import ee.liftertrans.dto.DriverRequestDto;
+import ee.liftertrans.infrastructure.exception.BusinessException;
+import ee.liftertrans.infrastructure.exception.ErrorCode;
 import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
 import ee.liftertrans.mapper.DriverMapper;
 import ee.liftertrans.persistence.repository.DriverRepository;
@@ -38,8 +40,17 @@ public class DriverService {
                 .orElseThrow(() -> new PrimaryKeyNotFoundException("driverId", driverId));
     }
 
+    // enne kustutamist veendume, et juhiga ei oleks soetud tellimusi. Otsime juhiId järgi
+
+
     public void deleteDriver(Integer driverId) {
-        driverRepository.delete(getValidDriverBy(driverId));
+
+        // enne kustutamist veendume, et juhiga ei oleks soetud tellimusi. Otsime juhiId järgi
+        Driver driver = getValidDriverBy(driverId);
+        if (driverRepository.existsJobsByDriverId(driverId)) {
+            throw  new BusinessException(ErrorCode.DRIVER_HAS_JOBS);
+        }
+        driverRepository.delete(driver);
     }
 
     public void createDriver(DriverRequestDto driverRequestDto) {

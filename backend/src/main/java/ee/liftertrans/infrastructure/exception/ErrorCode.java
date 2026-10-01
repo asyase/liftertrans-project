@@ -7,7 +7,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
   INVALID_SEARCH_PARAMETER(HttpStatus.BAD_REQUEST, "Otsingu parameeter on pikem kui 100 tähemärki"),
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Kasutaja ei ole sisse logitud"),
-  ACCESS_DENIED(HttpStatus.FORBIDDEN, "Kasutajal puudub ligipääs");
+  ACCESS_DENIED(HttpStatus.FORBIDDEN, "Kasutajal puudub ligipääs"),
+  DRIVER_HAS_JOBS(HttpStatus.CONFLICT, "Seda juhti ei saa kustutada, kuna temaga on seotud tellimusi");
 
   private final HttpStatus status;
   private final String message;

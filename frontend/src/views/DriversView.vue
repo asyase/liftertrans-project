@@ -3,9 +3,11 @@ import SessionStorageService from '@/services/SessionStorageService.js'
 import NavigationService from '@/services/NavigationService.js'
 import DriverService from '@/services/DriverService.js'
 import axios from 'axios'
+import { PhMagnifyingGlass } from '@phosphor-icons/vue'
 
 export default {
   name: 'DriversView',
+  components: { PhMagnifyingGlass },
 
   // Lehe avamisel laadime tööd backendist
   beforeMount() {
@@ -22,14 +24,28 @@ export default {
     return {
       drivers: [],
       searchText: '',
+      appliedSearchText: '',
 
       errorMessage: '',
+      successMessage: '',
 
       errorResponse: {
         message: '',
         errorCode: '',
       },
     }
+  },
+
+  computed: {
+    filteredDrivers() {
+      const search = this.appliedSearchText.trim().toLowerCase()
+
+      if (!search) {
+        return this.drivers
+      }
+
+      return this.drivers.filter((driver) => driver.name.toLowerCase().includes(search))
+    },
   },
 
   methods: {
@@ -54,6 +70,7 @@ export default {
         axios
           .delete('/api/drivers/' + driverId)
           .then(() => {
+            this.successMessage = 'Juht on kustutatud.'
             // värskendame tabelit
             this.getDrivers()
           })
@@ -62,6 +79,10 @@ export default {
             this.errorMessage = 'Kustutamine ebaõnnestus'
           })
       }
+    },
+
+    applyDriversSearch() {
+      this.appliedSearchText = this.searchText
     },
   },
 }
@@ -72,15 +93,30 @@ export default {
     <div v-if="errorMessage" class="alert alert-danger">
       {{ errorMessage }}
     </div>
+    <div v-if="successMessage" class="alert alert-success">
+      {{ successMessage}}
+    </div>
 
     <h1>Juhid</h1>
 
     <div class="row mb-3">
       <div class="col-md-4">
-        <input v-model="searchText" type="text" class="form-control" placeholder="Otsi juhti" />
+        <input
+          v-model="searchText"
+          type="text"
+          class="search-input"
+          placeholder="Otsi juhti"
+          @keyup.enter="applyDriversSearch"
+        />
+
+        <button type="button" class="search-btn" @click="applyDriversSearch" title="Otsi">
+          <PhMagnifyingGlass :size="22" />
+        </button>
       </div>
       <div class="col-auto">
-        <RouterLink :to="{ name: 'driver-create' }" class="btn btn-primary ms-2">+ Lisa juht</RouterLink>
+        <RouterLink :to="{ name: 'driver-create' }" class="btn btn-primary ms-2"
+          >+ Lisa juht</RouterLink
+        >
       </div>
     </div>
     <table class="table table-hover">
@@ -95,7 +131,7 @@ export default {
       </thead>
 
       <tbody>
-        <tr v-for="driver in drivers" :key="driver.driverId">
+        <tr v-for="driver in filteredDrivers" :key="driver.driverId">
           <td>{{ driver.name }}</td>
           <td>{{ driver.phone }}</td>
           <td>{{ driver.email }}</td>
