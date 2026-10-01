@@ -70,7 +70,7 @@ public class NlToSqlService {
             driver_id INTEGER REFERENCES liftertrans_project.driver(id),
             vehicle_id INTEGER REFERENCES liftertrans_project.vehicle(id),
             subcontractor_id INTEGER,
-            job_type VARCHAR(30) NOT NULL, -- 'TRANSPORT_AND_CRANE' or 'CRANE_ONLY'
+            job_type VARCHAR(30) NOT NULL, -- 'TRANSPORT_AND_CRANE', 'CRANE_ONLY' or 'TRANSPORT'
             execution_type VARCHAR(20) NOT NULL, -- 'INTERNAL' or 'SUBCONTRACTED'
             pickup_address VARCHAR(255),
             delivery_address VARCHAR(255),

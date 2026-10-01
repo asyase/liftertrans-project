@@ -143,4 +143,69 @@ public class JobController {
 
 
     }
+
+    @GetMapping("/drivers/{driverId}/jobs")
+    @Operation(summary = "Juhi töölaud: juhile määratud tööd staatusega PLANNED ja IN_PROGRESS")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "'message': Ei leidnud primary keyd 'driverId' väärtusega: 'y', 'errorCode': PRIMARY_KEY_NOT_FOUND",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            )
+    })
+    public List<JobDto> getDriverJobs(@PathVariable Integer driverId) {
+
+        return jobService.getDriverJobs(driverId);
+    }
+
+    @PatchMapping("/drivers/{driverId}/jobs/{jobId}/start")
+    @Operation(summary = "Juht alustab tööd: PLANNED → IN_PROGRESS")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "'message': status: töö staatus on ..., oodati PLANNED, 'errorCode': INCORRECT_JOB_STATUS",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "'message': Töö ei ole sellele juhile määratud, 'errorCode': ACCESS_DENIED",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "'message': Ei leidnud primary keyd 'jobId' väärtusega: 'y', 'errorCode': PRIMARY_KEY_NOT_FOUND",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            )
+    })
+    public void startDriverJob(@PathVariable Integer driverId, @PathVariable Integer jobId) {
+
+        jobService.startDriverJob(driverId, jobId);
+    }
+
+    @PatchMapping("/drivers/{driverId}/jobs/{jobId}/finish")
+    @Operation(summary = "Juht lõpetab töö: IN_PROGRESS → COMPLETED")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "'message': status: töö staatus on ..., oodati IN_PROGRESS, 'errorCode': INCORRECT_JOB_STATUS",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "'message': Töö ei ole sellele juhile määratud, 'errorCode': ACCESS_DENIED",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "'message': Ei leidnud primary keyd 'jobId' väärtusega: 'y', 'errorCode': PRIMARY_KEY_NOT_FOUND",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))
+            )
+    })
+    public void finishDriverJob(@PathVariable Integer driverId, @PathVariable Integer jobId) {
+
+        jobService.finishDriverJob(driverId, jobId);
+    }
 }

@@ -7,6 +7,7 @@ import router from './router'
 
 // Bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css'
+
 // Oma stiilid peale Bootstrapi, et brändi värvid kirjutaksid Bootstrapi omad üle
 import './assets/main.css'
 import 'bootstrap/dist/js/bootstrap.js'

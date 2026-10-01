@@ -11,7 +11,8 @@ import java.util.Arrays;
 public enum JobType {
 
     TRANSPORT_AND_CRANE("Transport ja kraana"),
-    CRANE_ONLY("Ainult kraana");
+    CRANE_ONLY("Ainult kraana"),
+    TRANSPORT("Ainult transport");
 
     private final String text;
 

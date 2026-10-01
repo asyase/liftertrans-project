@@ -5,6 +5,7 @@ import ee.liftertrans.dto.JobCreateResponseDto;
 import ee.liftertrans.dto.JobDetailDto;
 import ee.liftertrans.dto.JobDto;
 import ee.liftertrans.dto.SelectOptionDto;
+import ee.liftertrans.infrastructure.exception.ForbiddenException;
 import ee.liftertrans.infrastructure.exception.IncorrectInputException;
 import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
 import ee.liftertrans.mapper.JobMapper;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,6 +58,66 @@ public class JobService {
         // Otsime töö ID järgi, kui ei leia, siis 404
         return jobRepository.findById(jobId)
                 .orElseThrow(() -> new PrimaryKeyNotFoundException("jobId", jobId));
+    }
+
+    public List<JobDto> getDriverJobs(Integer driverId) {
+
+        // Kontrollime, et juht on olemas (kui pole, siis 404)
+        driverService.getValidDriverBy(driverId);
+
+        // Juhi töölaual on ainult aktiivsed tööd: planeeritud ja töös olevad
+        List<Job> jobs = jobRepository.findDriverJobsBy(driverId, List.of("PLANNED", "IN_PROGRESS"));
+
+        return jobMapper.toJobDtos(jobs);
+    }
+
+    @Transactional
+    public void startDriverJob(Integer driverId, Integer jobId) {
+
+        Job job = getValidDriverJobBy(driverId, jobId);
+
+        // Alustada saab ainult planeeritud tööd
+        validateJobStatus(job, "PLANNED");
+
+        job.setStatus("IN_PROGRESS");
+        job.setActualStartTime(Instant.now());
+        job.setUpdatedAt(Instant.now());
+        jobRepository.save(job);
+    }
+
+    @Transactional
+    public void finishDriverJob(Integer driverId, Integer jobId) {
+
+        Job job = getValidDriverJobBy(driverId, jobId);
+
+        // Lõpetada saab ainult töös olevat tööd
+        validateJobStatus(job, "IN_PROGRESS");
+
+        job.setStatus("COMPLETED");
+        job.setActualFinishTime(Instant.now());
+        job.setUpdatedAt(Instant.now());
+        jobRepository.save(job);
+    }
+
+    private Job getValidDriverJobBy(Integer driverId, Integer jobId) {
+
+        Job job = getValidJobBy(jobId);
+
+        // Juht tohib muuta ainult talle määratud tööd
+        if (job.getDriver() == null || !job.getDriver().getId().equals(driverId)) {
+            throw new ForbiddenException("Töö ei ole sellele juhile määratud", "ACCESS_DENIED");
+        }
+
+        return job;
+    }
+
+    private void validateJobStatus(Job job, String expectedStatus) {
+        if (!expectedStatus.equals(job.getStatus())) {
+            throw new IncorrectInputException(
+                    "status: töö staatus on " + job.getStatus() + ", oodati " + expectedStatus,
+                    "INCORRECT_JOB_STATUS"
+            );
+        }
     }
 
     public List<SelectOptionDto> getJobTypes() {
@@ -227,9 +289,9 @@ public class JobService {
         }
 
 
-        // TRANSPORT_AND_CRANE puhul
+        // TRANSPORT ja TRANSPORT_AND_CRANE puhul
         // on vajalik pealevõtu aadress
-        if ("TRANSPORT_AND_CRANE".equals(jobType)
+        if (isTransportJob(jobType)
                 && (request.getPickupAddress() == null
                 || request.getPickupAddress().isBlank())) {
 
@@ -240,9 +302,9 @@ public class JobService {
         }
 
 
-        // TRANSPORT_AND_CRANE puhul
+        // TRANSPORT ja TRANSPORT_AND_CRANE puhul
         // on vajalik kohaletoimetamise aadress
-        if ("TRANSPORT_AND_CRANE".equals(jobType)
+        if (isTransportJob(jobType)
                 && (request.getDeliveryAddress() == null
                 || request.getDeliveryAddress().isBlank())) {
 
@@ -251,5 +313,10 @@ public class JobService {
                     "INCORRECT_INPUT"
             );
         }
+    }
+
+    // Transporditööl (TRANSPORT, TRANSPORT_AND_CRANE) on pealevõtu ja kohaletoimetamise aadress
+    private boolean isTransportJob(String jobType) {
+        return "TRANSPORT".equals(jobType) || "TRANSPORT_AND_CRANE".equals(jobType);
     }
 }
