@@ -690,6 +690,13 @@ INSERT INTO driver (
       (4, 'Andres Oja', '+3725554444', 'andres.oja@liftertrans.ee', TRUE),
       (5, 'Kristo Vaher', '+3725555555', 'kristo.vaher@liftertrans.ee', TRUE);
 
+-- Juhid ilma töödeta (id 6-7) — mugavad kustutamise testimiseks
+INSERT INTO driver (
+    id, name, phone, email, active
+) VALUES
+      (6, 'Rein Tee', '+3725556060', 'rein.tee@liftertrans.ee', TRUE),
+      (7, 'Urmas Ojala', '+3725557070', 'urmas.ojala@liftertrans.ee', FALSE);
+
 -- Täiendavad tööd (id 8-10)
 INSERT INTO job (
     id, customer_id, vehicle_id, driver_id, subcontractor_id,
@@ -728,6 +735,63 @@ INSERT INTO job (
           CURRENT_DATE - INTERVAL '2 day 09:10', CURRENT_DATE - INTERVAL '2 day 12:40',
           48.00, 50.00, 4.00, 3.50,
           'COMPLETED', 'Töö edukalt lõpetatud.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Tänased tööd (id 11-15) — plaanitud algus on CURRENT_DATE, et admini esileht oleks täidetud
+INSERT INTO job (
+    id, customer_id, vehicle_id, driver_id, subcontractor_id,
+    job_type, execution_type,
+    pickup_address, delivery_address, service_address,
+    receiver_name, receiver_phone,
+    planned_start_time, planned_end_time, actual_start_time, actual_finish_time,
+    estimated_km, actual_km, estimated_hours, actual_hours,
+    status, notes, created_at, updated_at
+) VALUES
+      -- PLANNED: transport + kraana
+      (11, 1, 1, 1, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Lasnamäe tee 12, Tallinn', 'Kesklinna 4, Tallinn', NULL,
+          'Ants Asi', '+3725559876',
+          CURRENT_DATE + INTERVAL '0 day 08:00', CURRENT_DATE + INTERVAL '0 day 11:00', NULL, NULL,
+          40.00, NULL, 3.00, NULL,
+          'PLANNED', 'Hommikune vedu.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- PLANNED: ainult kraanatöö
+      (12, 2, 2, 2, NULL,
+          'CRANE_ONLY', 'INTERNAL',
+          NULL, NULL, 'Pärnu mnt 145, Tallinn',
+          'Mari Mets', '+3725551234',
+          CURRENT_DATE + INTERVAL '0 day 09:30', CURRENT_DATE + INTERVAL '0 day 12:00', NULL, NULL,
+          0.00, NULL, 2.50, NULL,
+          'PLANNED', 'Tõstetöö objektil.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- IN_PROGRESS: transport + kraana
+      (13, 4, 3, 4, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Tartu mnt 50, Tallinn', 'Viljandi mnt 8, Tallinn', NULL,
+          'Kristjan Lepik', '+3725557788',
+          CURRENT_DATE + INTERVAL '0 day 11:00', CURRENT_DATE + INTERVAL '0 day 15:00',
+          CURRENT_DATE + INTERVAL '0 day 11:05', NULL,
+          55.00, NULL, 4.00, NULL,
+          'IN_PROGRESS', 'Töö käib.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- COMPLETED: transport + kraana
+      (14, 5, 1, 5, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Sõpruse pst 10, Tallinn', 'Kadaka tee 42, Tallinn', NULL,
+          'Liis Saar', '+3725556677',
+          CURRENT_DATE + INTERVAL '0 day 07:00', CURRENT_DATE + INTERVAL '0 day 10:00',
+          CURRENT_DATE + INTERVAL '0 day 07:10', CURRENT_DATE + INTERVAL '0 day 09:50',
+          38.00, 40.00, 3.00, 2.70,
+          'COMPLETED', 'Vara lõpetatud.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- DRAFT: salvestatud, juht veel määramata
+      (15, 6, NULL, NULL, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Peterburi tee 90, Tallinn', 'Rävala pst 5, Tallinn', NULL,
+          'Toomas Rand', '+3725553399',
+          CURRENT_DATE + INTERVAL '0 day 16:00', CURRENT_DATE + INTERVAL '0 day 18:00', NULL, NULL,
+          25.00, NULL, 2.00, NULL,
+          'DRAFT', 'Auto ja juht tuleb veel määrata.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Täiendavad alltöövõtjad (id 2-3)
 INSERT INTO subcontractor (
