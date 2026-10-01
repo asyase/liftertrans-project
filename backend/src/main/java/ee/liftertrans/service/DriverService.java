@@ -8,8 +8,10 @@ import ee.liftertrans.infrastructure.exception.ErrorCode;
 import ee.liftertrans.infrastructure.exception.PrimaryKeyNotFoundException;
 import ee.liftertrans.mapper.DriverMapper;
 import ee.liftertrans.persistence.repository.DriverRepository;
+import ee.liftertrans.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ee.liftertrans.persistence.entity.Driver;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class DriverService {
 
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
+    private final UserRepository userRepository;
 
     public List<DriverDto> getAllDrivers() {
 
@@ -43,13 +46,20 @@ public class DriverService {
     // enne kustutamist veendume, et juhiga ei oleks soetud tellimusi. Otsime juhiId järgi
 
 
+    @Transactional
     public void deleteDriver(Integer driverId) {
 
         // enne kustutamist veendume, et juhiga ei oleks soetud tellimusi. Otsime juhiId järgi
         Driver driver = getValidDriverBy(driverId);
+
+        // Töödega juhti ei tohi kustutada
         if (driverRepository.existsJobsByDriverId(driverId)) {
-            throw  new BusinessException(ErrorCode.DRIVER_HAS_JOBS);
+            throw  new BusinessException(ErrorCode.RESOURCE_IN_USE);
         }
+
+        // Juhi küljes võib olla kasutajakonto (user.driver_id), mis muidu blokeeriks kustutamise
+        // andmebaasi tasemel — eemaldame selle enne juhi kustutamist
+        userRepository.deleteByDriverId(driverId);
         driverRepository.delete(driver);
     }
 

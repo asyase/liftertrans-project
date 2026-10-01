@@ -39,9 +39,45 @@ public class DriverController {
         return driverService.getAllDrivers();
     }
 
-    @DeleteMapping("/drivers/{id}")
-    public ResponseEntity<Void> deleteDriver(@PathVariable Integer id) {
-        driverService.deleteDriver(id);
+    @DeleteMapping("/drivers/{driverId}")
+    @Operation(summary = "Juhi kustutamine (ainult kui temaga ei ole seotud töid)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Juht on kustutatud"),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Juhiga on seotud töid, teda ei saa kustutada",
+                    content = @Content(
+                            schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "RESOURCE_IN_USE",
+                                    value = """
+                                            {
+                                              "message": "Juhti ei saa kustutada, kuna temaga on seotud töid",
+                                              "errorCode": "RESOURCE_IN_USE"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Juhti ei leitud",
+                    content = @Content(
+                            schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "PRIMARY_KEY_NOT_FOUND",
+                                    value = """
+                                            {
+                                              "message": "Ei leidnud primary keyd 'driverId' väärtusega: 99",
+                                              "errorCode": "PRIMARY_KEY_NOT_FOUND"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<Void> deleteDriver(@PathVariable Integer driverId) {
+        driverService.deleteDriver(driverId);
         return ResponseEntity.ok().build();
     }
 
