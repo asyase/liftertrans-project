@@ -200,8 +200,10 @@ public class JobService {
             job.setDriver(driverService.getValidDriverBy(request.getDriverId()));
         }
 
-        // TODO: kui subcontractorId != null, leia Subcontractor
-        // job.setSubcontractor(subcontractor);
+        // Alltöövõtja (ainult SUBCONTRACTED tööl, validateExecutionType kontrollib seda)
+        if (request.getSubcontractorId() != null) {
+            job.setSubcontractor(subcontractorService.getValidSubcontractorBy(request.getSubcontractorId()));
+        }
 
 
         // Salvestame töö andmebaasi
