@@ -80,49 +80,6 @@ export default {
     },
   },
 }
-//
-// import { ref, onMounted } from 'vue'
-// import data from 'bootstrap/js/src/dom/data.js'
-// // import { useRouter } from 'vue-router'
-//
-// // const router = useRouter()
-// const customers = ref([])
-// const searchQuery = ref('')
-//
-// const fetchCustomers = async () => {
-//   try {
-//     const response = await axios.get('/api/customers', {
-//       params: searchQuery.value ? { search: searchQuery.value } : {},
-//     })
-//
-//     customers.value = response.data
-//   } catch (error) {
-//     console.error('Viga klientide laadimisel:', error)
-//   }
-// }
-//
-// // Kustutamise kinnitamine ja API teostus
-// /* const confirmDelete = async (customer) => {
-//   if (confirm(`Kas oled kindel, et soovid kliendi "${customer.name}" kustutada?`)) {
-//     try {
-//       await axios.delete(`/api/customers/${customer.customerId}`)
-//       // Värskenda nimekirja pärast edukat kustutamist
-//       fetchCustomers()
-//     } catch (error) {
-//       // Axiose vea vastus asub error.response sees
-//       if (error.response) {
-//         alert(`Viga kustutamisel: ${error.response.data.message}`)
-//       } else {
-//         console.error('Viga kustutamisel:', error)
-//       }
-//     }
-//   }
-// }*/
-//
-//
-// onMounted(() => {
-//   fetchCustomers()
-// })
 </script>
 
 <template>
@@ -181,7 +138,7 @@ export default {
                   class="btn btn-sm btn-outline-secondary"
                   >Muuda
                 </router-link>
-                <button @click="confirmDelete(customer)" class="btn btn-primary">Kustuta</button>
+                <button @click="deleteCustomer(customer)" class="btn btn-primary">Kustuta</button>
               </td>
             </tr>
             <tr v-if="customers.length === 0">
@@ -245,15 +202,6 @@ th {
 }
 
 .actions-cell a,
-.btn-link {
-  margin-right: 8px;
-  color: #0066cc;
-  text-decoration: underline;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
 
 .text-danger {
   color: #cc0000;
