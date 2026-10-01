@@ -95,12 +95,12 @@ export default {
         <h2>Logi sisse</h2>
 
         <div class="form-floating mb-3">
-          <input v-model="email" type="email" class="form-control" placeholder="E-post" />
+          <input v-model="email" @keyup.enter="login" type="email" class="form-control" placeholder="E-post" />
           <label>Kasutajanimi / e-post</label>
         </div>
 
         <div class="form-floating mb-3">
-          <input v-model="password" type="password" class="form-control" placeholder="Parool" />
+          <input v-model="password" @keyup.enter="login" type="password" class="form-control" placeholder="Parool" />
           <label>Parool</label>
         </div>
 
