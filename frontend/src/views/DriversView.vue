@@ -32,8 +32,6 @@ export default {
     }
   },
 
-  computed
-
   methods: {
     getDrivers() {
       DriverService.getDriversRequest()
