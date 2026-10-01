@@ -144,7 +144,7 @@ export default {
                   class="btn btn-outline-secondary me-2"
                   >Muuda
                 </router-link>
-                <button @click="deleteCustomer(customer)" class="btn btn-dark">Kustuta</button>
+                <button @click="deleteCustomer(customer.customerId)" class="btn btn-dark">Kustuta</button>
               </td>
             </tr>
             <tr v-if="customers.length === 0">

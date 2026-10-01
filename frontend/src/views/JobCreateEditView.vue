@@ -9,6 +9,19 @@ import DriverService from '@/services/DriverService.js'
 export default {
   name: 'JobCreateEditView',
   computed: {
+    plannedHours() {
+      // Planeeritud töötunnid = lõpp - algus. Kui üks aeg puudub või lõpp pole pärast algust, siis null
+      if (!this.job.plannedStartTime || !this.job.plannedEndTime) {
+        return null
+      }
+      const milliseconds = new Date(this.job.plannedEndTime) - new Date(this.job.plannedStartTime)
+      if (milliseconds <= 0) {
+        return null
+      }
+      // Ümardame ühe komakohani, nt 4 või 2.5
+      return Math.round((milliseconds / 3600000) * 10) / 10
+    },
+
     filteredVehicles() {
       // Tellimusele saab valida ainult kasutuses oleva auto (mitte nt IN_SERVICE)
       const activeVehicles = this.vehicles.filter((vehicle) => vehicle.status === 'ACTIVE')
@@ -149,6 +162,10 @@ export default {
         ...this.job,
         plannedStartTime: this.toIsoString(this.job.plannedStartTime),
         plannedEndTime: this.toIsoString(this.job.plannedEndTime),
+        // Planeeritud töötunnid arvutatakse algus- ja lõpuajast (kasutaja ise ei sisesta)
+        estimatedHours: this.plannedHours,
+        // Tühjaks kustutatud numbriväli annab '' — saadame siis null
+        estimatedKm: this.job.estimatedKm === '' ? null : this.job.estimatedKm,
       }
 
       JobService.postJobRequest(jobRequest)
@@ -198,7 +215,11 @@ export default {
             <label for="customerId" class="form-label">Klient</label>
             <select id="customerId" v-model="job.customerId" class="form-select">
               <option :value="null">Vali klient</option>
-              <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+              <option
+                v-for="customer in customers"
+                :key="customer.customerId"
+                :value="customer.customerId"
+              >
                 {{ customer.companyName }}-{{ customer.name }}
               </option>
             </select>
@@ -320,16 +341,34 @@ export default {
             />
           </div>
         </div>
+
+        <!-- Kilometraaž sisestatakse käsitsi (kõigil töö tüüpidel, ka kraanatööl sõit objektile) -->
+        <div v-if="job.jobType" class="row g-3 mt-0">
+          <div class="col-md-6">
+            <label for="estimatedKm" class="form-label">Planeeritud kilometraaž</label>
+            <div class="input-group">
+              <input
+                id="estimatedKm"
+                v-model.number="job.estimatedKm"
+                type="number"
+                min="0"
+                step="0.1"
+                class="form-control"
+              />
+              <span class="input-group-text">km</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="card lt-section mb-4">
       <div class="card-body">
-        <h3 class="card-title mb-3">4. Aeg</h3>
+        <h3 class="card-title mb-3">4. Planeeritud aeg</h3>
 
         <div class="row g-3">
           <div class="col-md-6">
-            <label for="plannedStartTime" class="form-label">Planeeritud algus</label>
+            <label for="plannedStartTime" class="form-label">Planeeritud algusaeg</label>
             <input
               id="plannedStartTime"
               v-model="job.plannedStartTime"
@@ -338,7 +377,7 @@ export default {
             />
           </div>
           <div class="col-md-6">
-            <label for="plannedEndTime" class="form-label">Planeeritud lõpp</label>
+            <label for="plannedEndTime" class="form-label">Planeeritud lõpuaeg</label>
             <input
               id="plannedEndTime"
               v-model="job.plannedEndTime"
@@ -346,7 +385,25 @@ export default {
               class="form-control"
             />
           </div>
+          <div class="col-md-6">
+            <label for="plannedHours" class="form-label">Planeeritud töötunnid</label>
+            <div class="input-group">
+              <input
+                id="plannedHours"
+                :value="plannedHours ?? '—'"
+                type="text"
+                class="form-control"
+                readonly
+              />
+              <span class="input-group-text">h (arvutatud)</span>
+            </div>
+          </div>
         </div>
+
+        <p class="text-body-secondary small mt-3 mb-0">
+          Tegelikku algus- ja lõpuaega siin ei sisestata.<br />
+          Need salvestatakse automaatselt, kui juht töö alustab ja lõpetab.
+        </p>
       </div>
     </div>
 

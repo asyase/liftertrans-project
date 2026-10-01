@@ -150,9 +150,6 @@ export default {
 
       <ul class="nav nav-tabs mb-3">
         <li class="nav-item"><span class="nav-link active">Ülevaade</span></li>
-        <li class="nav-item"><span class="nav-link disabled">Kaup</span></li>
-        <li class="nav-item"><span class="nav-link disabled">Dokumendid</span></li>
-        <li class="nav-item"><span class="nav-link disabled">Staatuse ajalugu</span></li>
       </ul>
 
       <div class="row g-3">

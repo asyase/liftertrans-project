@@ -32,4 +32,19 @@ export default {
     // Küsime backendilt ühe töö andmed
     return axios.get('/api/jobs/' + jobId)
   },
+
+  getDriverJobsRequest(driverId) {
+    // Küsime backendilt juhile määratud aktiivsed tööd (PLANNED, IN_PROGRESS)
+    return axios.get('/api/drivers/' + driverId + '/jobs')
+  },
+
+  startDriverJobRequest(driverId, jobId) {
+    // Juht alustab tööd: PLANNED → IN_PROGRESS
+    return axios.patch('/api/drivers/' + driverId + '/jobs/' + jobId + '/start')
+  },
+
+  finishDriverJobRequest(driverId, jobId) {
+    // Juht lõpetab töö: IN_PROGRESS → COMPLETED
+    return axios.patch('/api/drivers/' + driverId + '/jobs/' + jobId + '/finish')
+  },
 }
