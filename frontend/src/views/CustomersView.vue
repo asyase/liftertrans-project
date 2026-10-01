@@ -203,10 +203,6 @@ th {
 
 .actions-cell a,
 
-.text-danger {
-  color: #cc0000;
-}
-
 .text-center {
   text-align: center;
 }
