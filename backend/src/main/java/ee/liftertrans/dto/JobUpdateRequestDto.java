@@ -7,9 +7,10 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+// Olemasoleva tellimuse muutmise andmed (PUT /api/jobs/{jobId}).
+// Väljad on samad mis loomisel; staatust siit ei muudeta.
 @Data
-
-public class JobCreateRequestDto implements JobRequest {
+public class JobUpdateRequestDto implements JobRequest {
 
     @NotNull
     private Integer customerId;

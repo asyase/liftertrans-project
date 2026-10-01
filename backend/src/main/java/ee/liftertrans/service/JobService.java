@@ -4,6 +4,8 @@ import ee.liftertrans.dto.JobCreateRequestDto;
 import ee.liftertrans.dto.JobCreateResponseDto;
 import ee.liftertrans.dto.JobDetailDto;
 import ee.liftertrans.dto.JobDto;
+import ee.liftertrans.dto.JobRequest;
+import ee.liftertrans.dto.JobUpdateRequestDto;
 import ee.liftertrans.dto.SelectOptionDto;
 import ee.liftertrans.infrastructure.exception.ForbiddenException;
 import ee.liftertrans.infrastructure.exception.IncorrectInputException;
@@ -31,6 +33,7 @@ public class JobService {
     private final VehicleService vehicleService;
     // Kliendi leidmiseks customerId järgi (sama moodi nagu juht ja sõiduk)
     private final CustomerService customerService;
+    private final SubcontractorService subcontractorService;
 
 
     public List<JobDto> getJobs() {
@@ -209,7 +212,67 @@ public class JobService {
     }
 
 
-    private void validateJobType(JobCreateRequestDto request) {
+    @Transactional
+    public JobDetailDto updateJob(Integer jobId, JobUpdateRequestDto request) {
+
+        // Leiame olemasoleva töö (kui pole, siis 404)
+        Job job = getValidJobBy(jobId);
+
+        // Samad kontrollid nagu loomisel (tüüp, teostamise viis, aadressid)
+        validateJobType(request);
+        validateExecutionType(request);
+        validateAddresses(request);
+
+        // Töö tüüp ja teostamise viis
+        job.setJobType(request.getJobType());
+        job.setExecutionType(request.getExecutionType());
+
+        // Aadressid
+        job.setPickupAddress(request.getPickupAddress());
+        job.setDeliveryAddress(request.getDeliveryAddress());
+        job.setServiceAddress(request.getServiceAddress());
+
+        // Vastuvõtja
+        job.setReceiverName(request.getReceiverName());
+        job.setReceiverPhone(request.getReceiverPhone());
+
+        // Planeeritud ajad
+        job.setPlannedStartTime(request.getPlannedStartTime());
+        job.setPlannedEndTime(request.getPlannedEndTime());
+
+        // Hinnangulised km ja tunnid
+        job.setEstimatedKm(request.getEstimatedKm());
+        job.setEstimatedHours(request.getEstimatedHours());
+
+        // Märkused
+        job.setNotes(request.getNotes());
+
+        // Klient on kohustuslik (tühja customerId püüab @NotNull DTO-s)
+        job.setCustomer(customerService.getValidCustomerBy(request.getCustomerId()));
+
+        // Sõiduk, juht ja alltöövõtja — kui väärtus puudub, siis seos eemaldatakse
+        job.setVehicle(request.getVehicleId() != null
+                ? vehicleService.getValidVehicleBy(request.getVehicleId())
+                : null);
+
+        job.setDriver(request.getDriverId() != null
+                ? driverService.getValidDriverBy(request.getDriverId())
+                : null);
+
+        job.setSubcontractor(request.getSubcontractorId() != null
+                ? subcontractorService.getValidSubcontractorBy(request.getSubcontractorId())
+                : null);
+
+        // Tavaline muutmine ei muuda staatust (DRAFT -> DRAFT, PLANNED -> PLANNED)
+        job.setUpdatedAt(Instant.now());
+
+        Job savedJob = jobRepository.save(job);
+
+        return jobMapper.toJobDetailDto(savedJob);
+    }
+
+
+    private void validateJobType(JobRequest request) {
 
         String jobType = request.getJobType();
 
@@ -224,7 +287,7 @@ public class JobService {
     }
 
 
-    private void validateExecutionType(JobCreateRequestDto request) {
+    private void validateExecutionType(JobRequest request) {
 
         String executionType = request.getExecutionType();
 
@@ -272,7 +335,7 @@ public class JobService {
     }
 
 
-    private void validateAddresses(JobCreateRequestDto request) {
+    private void validateAddresses(JobRequest request) {
 
         String jobType = request.getJobType();
 

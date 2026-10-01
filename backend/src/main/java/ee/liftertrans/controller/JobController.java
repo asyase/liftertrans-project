@@ -144,6 +144,52 @@ public class JobController {
 
     }
 
+    @PutMapping("/jobs/{jobId}")
+    @Operation(
+            summary = "Olemasoleva tellimuse andmete muutmine. Staatust ei muudeta"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Tellimus on edukalt muudetud"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Sisendandmed on vigased",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "INCORRECT_INPUT",
+                                    value = """
+                                            {
+                                              "message": "customerId: ei tohi olla tühi",
+                                              "errorCode": "INCORRECT_INPUT"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Tellimust või seotud objekti (nt jobId, customerId) ei leitud",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "PRIMARY_KEY_NOT_FOUND",
+                                    value = """
+                                            {
+                                              "message": "Ei leidnud primary keyd 'jobId' väärtusega: 999",
+                                              "errorCode": "PRIMARY_KEY_NOT_FOUND"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    public JobDetailDto updateJob(@PathVariable Integer jobId,
+                                  @RequestBody @Valid JobUpdateRequestDto jobUpdateRequestDto) {
+
+        return jobService.updateJob(jobId, jobUpdateRequestDto);
+    }
+
     @GetMapping("/drivers/{driverId}/jobs")
     @Operation(summary = "Juhi töölaud: juhile määratud tööd staatusega PLANNED ja IN_PROGRESS")
     @ApiResponses(value = {
