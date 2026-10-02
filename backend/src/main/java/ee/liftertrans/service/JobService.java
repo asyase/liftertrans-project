@@ -169,6 +169,9 @@ public class JobService {
         // Kontrollime aadresse
         validateAddresses(request);
 
+        // Kontrollime, et planeeritud lõpp oleks pärast algust
+        validatePlannedTimes(request);
+
 
         // Loome uue Job entity
         Job job = new Job();
@@ -238,10 +241,11 @@ public class JobService {
         // Leiame olemasoleva töö (kui pole, siis 404)
         Job job = getValidJobBy(jobId);
 
-        // Samad kontrollid nagu loomisel (tüüp, teostamise viis, aadressid)
+        // Samad kontrollid nagu loomisel (tüüp, teostamise viis, aadressid, ajad)
         validateJobType(request);
         validateExecutionType(request);
         validateAddresses(request);
+        validatePlannedTimes(request);
 
         // Töö tüüp ja teostamise viis
         job.setJobType(request.getJobType());
@@ -409,6 +413,19 @@ public class JobService {
 
             throw new IncorrectInputException(
                     "deliveryAddress: kohaletoimetamise aadress on kohustuslik",
+                    "INCORRECT_INPUT"
+            );
+        }
+    }
+
+    private void validatePlannedTimes(JobRequest request) {
+
+        // Lõpuaeg on valikuline — kui see on antud, peab see olema pärast algusaega
+        if (request.getPlannedEndTime() != null
+                && !request.getPlannedEndTime().isAfter(request.getPlannedStartTime())) {
+
+            throw new IncorrectInputException(
+                    "plannedEndTime: planeeritud lõpuaeg peab olema pärast algusaega",
                     "INCORRECT_INPUT"
             );
         }
