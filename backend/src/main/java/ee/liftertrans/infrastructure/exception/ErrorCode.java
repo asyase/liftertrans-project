@@ -8,7 +8,8 @@ public enum ErrorCode {
   INVALID_SEARCH_PARAMETER(HttpStatus.BAD_REQUEST, "Otsingu parameeter on pikem kui 100 tähemärki"),
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Kasutaja ei ole sisse logitud"),
   ACCESS_DENIED(HttpStatus.FORBIDDEN, "Kasutajal puudub ligipääs"),
-  RESOURCE_IN_USE(HttpStatus.CONFLICT, "Juhti ei saa kustutada, kuna temaga on seotud töid");
+  RESOURCE_IN_USE(HttpStatus.CONFLICT, "Juhti ei saa kustutada, kuna temaga on seotud töid"),
+  CUSTOMER_IN_USE(HttpStatus.CONFLICT, "Klienti ei saa kustutada, kuna temaga on seotud töid");
 
   private final HttpStatus status;
   private final String message;

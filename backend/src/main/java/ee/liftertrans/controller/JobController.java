@@ -12,8 +12,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -26,7 +28,7 @@ public class JobController {
 
     @GetMapping("/jobs")
     @Operation(
-            summary = "Tööde nimekirja kuvamine. Tagastab kõik tööd"
+            summary = "Tööde nimekirja kuvamine. Filtrid (date, status, driverId, vehicleId) on valikulised — ilma nendeta tagastab kõik tööd"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -34,10 +36,13 @@ public class JobController {
                     description = "OK"
             )
     })
-    public List<JobDto> getJobs() {
+    public List<JobDto> getJobs(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                @RequestParam(required = false) String status,
+                                @RequestParam(required = false) Integer driverId,
+                                @RequestParam(required = false) Integer vehicleId) {
 
-        // Küsime service'ilt tööde nimekirja
-        List<JobDto> jobs = jobService.getJobs();
+        // Küsime service'ilt tööde nimekirja (null filtrid jäetakse arvestamata)
+        List<JobDto> jobs = jobService.getJobs(date, status, driverId, vehicleId);
 
         return jobs;
     }

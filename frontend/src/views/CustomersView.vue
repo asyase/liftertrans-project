@@ -75,8 +75,9 @@ export default {
         CustomerService.deleteCustomerRequest(customerId)
             .then(() => this.getCustomers()) // värskendame tabelit
             .catch((error) => {
-              console.error('Kustutamise viga:', error)
-              this.errorMessage = 'Kustutamine ebaõnnestus'
+              // Näitame backendi tegelikku veateadet (nt "kliendiga on seotud töid"),
+              // kui seda pole, siis üldist teadet
+              this.errorMessage = error.response?.data?.message ?? 'Kustutamine ebaõnnestus'
             })
       }
     },

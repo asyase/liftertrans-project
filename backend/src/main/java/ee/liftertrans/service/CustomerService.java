@@ -9,6 +9,7 @@ import ee.liftertrans.persistence.entity.Customer;
 import ee.liftertrans.persistence.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,5 +36,19 @@ public class CustomerService {
         // Otsime kliendi ID järgi, kui ei leia, siis 404 (PRIMARY_KEY_NOT_FOUND)
         return customerRepository.findById(customerId)
                 .orElseThrow(() -> new PrimaryKeyNotFoundException("customerId", customerId));
+    }
+
+    @Transactional
+    public void deleteCustomer(Integer customerId) {
+
+        // Kui klienti ei leia, siis 404
+        Customer customer = getValidCustomerBy(customerId);
+
+        // Töödega klienti ei tohi kustutada
+        if (customerRepository.existsJobsByCustomerId(customerId)) {
+            throw new BusinessException(ErrorCode.CUSTOMER_IN_USE);
+        }
+
+        customerRepository.delete(customer);
     }
 }
