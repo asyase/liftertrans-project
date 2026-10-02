@@ -1,5 +1,7 @@
 package ee.liftertrans.dto;
 
+import java.time.Instant;
+
 // Ühised väljad, mida töö loomise ja muutmise valideerimine vajab.
 // Nii saavad JobCreateRequestDto ja JobUpdateRequestDto kasutada samu valideerimismeetodeid.
 public interface JobRequest {
@@ -17,4 +19,8 @@ public interface JobRequest {
     String getDeliveryAddress();
 
     String getServiceAddress();
+
+    Instant getPlannedStartTime();
+
+    Instant getPlannedEndTime();
 }
