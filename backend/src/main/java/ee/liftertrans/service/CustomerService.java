@@ -36,4 +36,35 @@ public class CustomerService {
         return customerRepository.findById(customerId)
                 .orElseThrow(() -> new PrimaryKeyNotFoundException("customerId", customerId));
     }
+
+    @Transactional
+    public CustomerDetailDto createCustomer(CustomerCreateRequestDto requestDto) {
+        if (customerRepository.existsByCompanyRegistrationNumber(requestDto.getCompanyRegistrationNumber())) {
+            throw new CustomerAlreadyExistsException("Sellise registrikoodiga klient on juba olemas");
+        }
+
+        Customer customer = Customer.builder()
+                .name(requestDto.getName())
+                .companyName(requestDto.getCompanyName())
+                .companyRegistrationNumber(requestDto.getCompanyRegistrationNumber())
+                .vatNumber(requestDto.getVatNumber())
+                .email(requestDto.getEmail())
+                .invoiceEmail(requestDto.getInvoiceEmail())
+                .phone(requestDto.getPhone())
+                .build();
+
+        Customer savedCustomer = customerRepository.save(customer);
+
+        return CustomerDetailDto.builder()
+                .id(savedCustomer.getId())
+                .name(savedCustomer.getName())
+                .companyName(savedCustomer.getCompanyName())
+                .companyRegistrationNumber(savedCustomer.getCompanyRegistrationNumber())
+                .vatNumber(savedCustomer.getVatNumber())
+                .email(savedCustomer.getEmail())
+                .invoiceEmail(savedCustomer.getInvoiceEmail())
+                .phone(savedCustomer.getPhone())
+                .build();
+    }
+}
 }

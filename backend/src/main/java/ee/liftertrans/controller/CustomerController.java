@@ -74,7 +74,20 @@ public class CustomerController {
                                             """
                             )
                     )
-            )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "CUSTOMER_ALREADY_EXISTS - Sellise registrikoodiga klient on juba olemas",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                        examples = @ExampleObject(
+                        name = "CUSTOMER_ALREADY_EXISTS",
+                            value = """
+                                             {
+                                               "message": "Sellise registrikoodiga klient on juba olemas",
+                                               "errorCode": "CUSTOMER_ALREADY_EXISTS"
+                                             }
+                                             """
+                        )))
     })
     public List<CustomerDto> getCustomers(@RequestParam(required = false) String search) {
         return customerService.getCustomers(search);
