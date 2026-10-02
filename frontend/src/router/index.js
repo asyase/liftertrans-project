@@ -11,6 +11,7 @@ import DriversView from '@/views/DriversView.vue'
 import DriverCreateEditView from '@/views/DriverCreateEditView.vue'
 import DriverDetailView from '@/views/DriverDetailView.vue'
 import CustomersView from '@/views/CustomersView.vue'
+import CalendarView from '@/views/CalendarView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +63,13 @@ const router = createRouter({
       component: JobCreateEditView,
     },
 
+    // Olemasoleva tellimuse muutmine (sama vorm nagu loomisel)
+    {
+      path: '/jobs/:id/edit',
+      name: 'job-edit',
+      component: JobCreateEditView,
+    },
+
     // Ühe töö detailvaade, :id = töö ID (/jobs/new on täpsem rada, see läheb ette)
     {
       path: '/jobs/:id',
@@ -97,6 +105,12 @@ const router = createRouter({
       path: '/customers',
       name: 'customersView',
       component: CustomersView,
+    },
+
+    {
+      path: '/calendar',
+      name: 'calendarRoute',
+      component: CalendarView,
     },
   ],
 })

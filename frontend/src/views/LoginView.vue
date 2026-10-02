@@ -1,5 +1,6 @@
 <script>
 import AuthService from '@/services/AuthService.js'
+import liftertransLogo from '@/assets/liftertrans-logo.png'
 
 export default {
   name: 'LoginView',
@@ -10,6 +11,7 @@ export default {
   // Vormi andmed ja olek
   data() {
     return {
+      logoUrl: liftertransLogo,
       email: '',
       password: '',
       errorMessage: '',
@@ -82,6 +84,11 @@ export default {
 
 <template>
   <div class="container text-center">
+    <!-- LIFTERTRANS logo -->
+    <div class="mb-4 mt-4">
+      <img :src="logoUrl" alt="LIFTERTRANS" class="lt-login-logo" />
+    </div>
+
     <div class="row justify-content-center">
       <div class="col col-6">
         <div v-if="errorMessage" class="alert alert-danger mb-3" role="alert">
@@ -109,3 +116,12 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* LIFTERTRANS logo: piiratud laius, et see ei oleks liiga suur ja mahuks mobiilis */
+.lt-login-logo {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+}
+</style>

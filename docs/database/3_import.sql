@@ -668,6 +668,191 @@ INSERT INTO job_status_history (
 
 
 -- =========================================================
+-- LISAANDMED: täiendavad kliendid, juhid ja tööd
+-- =========================================================
+
+-- Täiendavad kliendid (id 4-6)
+INSERT INTO customer (
+    id, name, company_name, email, phone, created_at,
+    company_registration_number, vat_number, invoice_email
+) VALUES
+      (4, 'Kristjan Lepik', 'Põhjala Ehitus OÜ', 'kristjan@pohjalaehitus.ee', '+3725557788',
+          CURRENT_TIMESTAMP, '11223344', 'EE112233445', 'arved@pohjalaehitus.ee'),
+      (5, 'Liis Saar', 'Saare Logistika AS', 'liis@saarelogistika.ee', '+3725556677',
+          CURRENT_TIMESTAMP, '55667788', 'EE556677889', 'arved@saarelogistika.ee'),
+      (6, 'Toomas Rand', 'Rand Grupp OÜ', 'toomas@randgrupp.ee', '+3725553399',
+          CURRENT_TIMESTAMP, '99887766', NULL, 'arved@randgrupp.ee');
+
+-- Täiendavad juhid (id 4-5)
+INSERT INTO driver (
+    id, name, phone, email, active
+) VALUES
+      (4, 'Andres Oja', '+3725554444', 'andres.oja@liftertrans.ee', TRUE),
+      (5, 'Kristo Vaher', '+3725555555', 'kristo.vaher@liftertrans.ee', TRUE);
+
+-- Juhid ilma töödeta (id 6-7) — mugavad kustutamise testimiseks
+INSERT INTO driver (
+    id, name, phone, email, active
+) VALUES
+      (6, 'Rein Tee', '+3725556060', 'rein.tee@liftertrans.ee', TRUE),
+      (7, 'Urmas Ojala', '+3725557070', 'urmas.ojala@liftertrans.ee', FALSE);
+
+-- Täiendavad tööd (id 8-10)
+INSERT INTO job (
+    id, customer_id, vehicle_id, driver_id, subcontractor_id,
+    job_type, execution_type,
+    pickup_address, delivery_address, service_address,
+    receiver_name, receiver_phone,
+    planned_start_time, planned_end_time, actual_start_time, actual_finish_time,
+    estimated_km, actual_km, estimated_hours, actual_hours,
+    status, notes, created_at, updated_at
+) VALUES
+      -- PLANNED: oma ressursiga transport + kraana
+      (8, 4, 1, 4, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Tartu mnt 50, Tallinn', 'Viljandi mnt 8, Tallinn', NULL,
+          'Kristjan Lepik', '+3725557788',
+          CURRENT_DATE + INTERVAL '3 day 08:00', CURRENT_DATE + INTERVAL '3 day 12:00', NULL, NULL,
+          55.00, NULL, 4.00, NULL,
+          'PLANNED', 'Elementide transport ehitusplatsile.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- IN_PROGRESS: ainult kraanatöö
+      (9, 5, 2, 5, NULL,
+          'CRANE_ONLY', 'INTERNAL',
+          NULL, NULL, 'Sadama tee 15, Tallinn',
+          'Liis Saar', '+3725556677',
+          CURRENT_DATE + INTERVAL '0 day 10:00', CURRENT_DATE + INTERVAL '0 day 14:00',
+          CURRENT_TIMESTAMP - INTERVAL '1 hour', NULL,
+          0.00, NULL, 4.00, NULL,
+          'IN_PROGRESS', 'Konteinerite tõstmine laevalt.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- COMPLETED: lõpetatud transport + kraana
+      (10, 6, 3, 1, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Peterburi tee 90, Tallinn', 'Rävala pst 5, Tallinn', NULL,
+          'Toomas Rand', '+3725553399',
+          CURRENT_DATE - INTERVAL '2 day 09:00', CURRENT_DATE - INTERVAL '2 day 13:00',
+          CURRENT_DATE - INTERVAL '2 day 09:10', CURRENT_DATE - INTERVAL '2 day 12:40',
+          48.00, 50.00, 4.00, 3.50,
+          'COMPLETED', 'Töö edukalt lõpetatud.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Tänased tööd (id 11-15) — plaanitud algus on CURRENT_DATE, et admini esileht oleks täidetud
+INSERT INTO job (
+    id, customer_id, vehicle_id, driver_id, subcontractor_id,
+    job_type, execution_type,
+    pickup_address, delivery_address, service_address,
+    receiver_name, receiver_phone,
+    planned_start_time, planned_end_time, actual_start_time, actual_finish_time,
+    estimated_km, actual_km, estimated_hours, actual_hours,
+    status, notes, created_at, updated_at
+) VALUES
+      -- PLANNED: transport + kraana
+      (11, 1, 1, 1, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Lasnamäe tee 12, Tallinn', 'Kesklinna 4, Tallinn', NULL,
+          'Ants Asi', '+3725559876',
+          CURRENT_DATE + INTERVAL '0 day 08:00', CURRENT_DATE + INTERVAL '0 day 11:00', NULL, NULL,
+          40.00, NULL, 3.00, NULL,
+          'PLANNED', 'Hommikune vedu.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- PLANNED: ainult kraanatöö
+      (12, 2, 2, 2, NULL,
+          'CRANE_ONLY', 'INTERNAL',
+          NULL, NULL, 'Pärnu mnt 145, Tallinn',
+          'Mari Mets', '+3725551234',
+          CURRENT_DATE + INTERVAL '0 day 09:30', CURRENT_DATE + INTERVAL '0 day 12:00', NULL, NULL,
+          0.00, NULL, 2.50, NULL,
+          'PLANNED', 'Tõstetöö objektil.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- IN_PROGRESS: transport + kraana
+      (13, 4, 3, 4, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Tartu mnt 50, Tallinn', 'Viljandi mnt 8, Tallinn', NULL,
+          'Kristjan Lepik', '+3725557788',
+          CURRENT_DATE + INTERVAL '0 day 11:00', CURRENT_DATE + INTERVAL '0 day 15:00',
+          CURRENT_DATE + INTERVAL '0 day 11:05', NULL,
+          55.00, NULL, 4.00, NULL,
+          'IN_PROGRESS', 'Töö käib.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- COMPLETED: transport + kraana
+      (14, 5, 1, 5, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Sõpruse pst 10, Tallinn', 'Kadaka tee 42, Tallinn', NULL,
+          'Liis Saar', '+3725556677',
+          CURRENT_DATE + INTERVAL '0 day 07:00', CURRENT_DATE + INTERVAL '0 day 10:00',
+          CURRENT_DATE + INTERVAL '0 day 07:10', CURRENT_DATE + INTERVAL '0 day 09:50',
+          38.00, 40.00, 3.00, 2.70,
+          'COMPLETED', 'Vara lõpetatud.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+      -- DRAFT: salvestatud, juht veel määramata
+      (15, 6, NULL, NULL, NULL,
+          'TRANSPORT_AND_CRANE', 'INTERNAL',
+          'Peterburi tee 90, Tallinn', 'Rävala pst 5, Tallinn', NULL,
+          'Toomas Rand', '+3725553399',
+          CURRENT_DATE + INTERVAL '0 day 16:00', CURRENT_DATE + INTERVAL '0 day 18:00', NULL, NULL,
+          25.00, NULL, 2.00, NULL,
+          'DRAFT', 'Auto ja juht tuleb veel määrata.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Täiendavad alltöövõtjad (id 2-3)
+INSERT INTO subcontractor (
+    id, company_name, contact_name, phone, email, notes, active,
+    company_registration_number, vat_number
+) VALUES
+    (2, 'Kiire Vedu OÜ', 'Marko Lään', '+3725558899', 'info@kiirevedu.ee',
+        'Suuremate kaugvedude partner.', TRUE, '22334455', 'EE223344556'),
+    (3, 'Põhja Kraanad AS', 'Tiit Oras', '+3725551100', 'info@pohjakraanad.ee',
+        'Tõstetööd erivarustusega.', FALSE, '33445566', NULL);
+
+-- Täiendavad kasutajakontod juhtidele (id 5-8), parool kõigil '123'
+INSERT INTO "user" (
+    id, email, password_hash, role_id, driver_id, status
+) VALUES
+      (5, 'jaan.kask@liftertrans.ee', '123', 2, 2, 'A'),
+      (6, 'peeter.sild@liftertrans.ee', '123', 2, 3, 'D'),
+      (7, 'andres.oja@liftertrans.ee', '123', 2, 4, 'A'),
+      (8, 'kristo.vaher@liftertrans.ee', '123', 2, 5, 'A');
+
+-- Last uutele töödele (id 5-7)
+INSERT INTO cargo (
+    id, job_id, description, weight_kg, length_m, width_m, height_m, quantity,
+    cargo_photo_url, notes
+) VALUES
+      (5, 8, 'Raudbetoonelemendid', 5200.00, 4.00, 1.50, 0.90, 8,
+          '/demo/cargo/raudbetoon.jpg', 'Tõstmine ettevaatlikult.'),
+      (6, 9, 'Merekonteiner 20ft', 2300.00, 6.06, 2.44, 2.59, 1,
+          '/demo/cargo/konteiner.jpg', 'Tõstetakse laevalt kaile.'),
+      (7, 10, 'Teraskonstruktsioonid', 3800.00, 5.00, 1.20, 1.00, 5,
+          '/demo/cargo/terakonstruktsioonid.jpg', NULL);
+
+-- Staatuste ajalugu uutele töödele (id 12-15)
+INSERT INTO job_status_history (
+    id, job_id, old_status, new_status, changed_at, changed_by, comment
+) VALUES
+      (12, 8, 'DRAFT', 'PLANNED', CURRENT_TIMESTAMP - INTERVAL '1 day', 'admin@liftertrans.ee', 'Töö planeeritud ja juht määratud'),
+      (13, 9, 'PLANNED', 'IN_PROGRESS', CURRENT_TIMESTAMP - INTERVAL '1 hour', 'kristo.vaher@liftertrans.ee', 'Töö alustatud'),
+      (14, 10, 'PLANNED', 'IN_PROGRESS', CURRENT_TIMESTAMP - INTERVAL '2 day 09:10', 'mart.tamm@liftertrans.ee', 'Töö alustatud'),
+      (15, 10, 'IN_PROGRESS', 'COMPLETED', CURRENT_TIMESTAMP - INTERVAL '2 day 12:40', 'mart.tamm@liftertrans.ee', 'Töö lõpetatud');
+
+-- Veodokument lõpetatud tööle (id 2)
+INSERT INTO transport_document (
+    id, job_id, document_number, sender_name, sender_address,
+    receiver_name, receiver_address, carrier_name, cargo_description,
+    cargo_weight_kg, loading_date, delivery_date, generated_file_url, created_at
+) VALUES
+      (2, 10, 'CMR-2026-0010', 'Rand Grupp OÜ', 'Peterburi tee 90, Tallinn',
+          'Toomas Rand', 'Rävala pst 5, Tallinn', 'LifterTrans OÜ', 'Teraskonstruktsioonid',
+          3800.00, CURRENT_DATE - INTERVAL '2 day', CURRENT_DATE - INTERVAL '2 day',
+          '/demo/documents/cmr-2026-0010.pdf', CURRENT_TIMESTAMP);
+
+-- Töödokumendid lõpetatud tööle (id 4-5)
+INSERT INTO job_document (
+    id, job_id, document_type, file_name, file_url, uploaded_at
+) VALUES
+      (4, 10, 'DELIVERY_PHOTO', 'kohaletoimetamine.jpg', '/demo/documents/kohaletoimetamine.jpg', CURRENT_TIMESTAMP),
+      (5, 10, 'WAYBILL_PHOTO', 'saateleht.jpg', '/demo/documents/saateleht.jpg', CURRENT_TIMESTAMP);
+
+
+-- =========================================================
 -- UPDATE SEQUENCE COUNTERS
 -- =========================================================
 
