@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,11 +37,27 @@ public class JobService {
     private final CustomerService customerService;
     private final SubcontractorService subcontractorService;
 
+    // Ajavöönd, mille järgi kuupäevafilter päeva piirid arvutab
+    private static final ZoneId BUSINESS_ZONE = ZoneId.of("Europe/Tallinn");
 
-    public List<JobDto> getJobs() {
 
-        // Võtame kõik tööd andmebaasist
-        List<Job> jobs = jobRepository.findAll();
+    public List<JobDto> getJobs(LocalDate date, String status, Integer driverId, Integer vehicleId) {
+
+        // Kuupäev on Eesti aja järgi — teisendame selle päeva alguse ja lõpu Instant'ideks
+        Instant dayStart = null;
+        Instant dayEnd = null;
+        if (date != null) {
+            dayStart = date.atStartOfDay(BUSINESS_ZONE).toInstant();
+            dayEnd = date.plusDays(1).atStartOfDay(BUSINESS_ZONE).toInstant();
+        }
+
+        // Tühi staatus (?status=) tähendab sama, mis staatuse filter puudub
+        if (status != null && status.isBlank()) {
+            status = null;
+        }
+
+        // Võtame filtritele vastavad tööd andmebaasist
+        List<Job> jobs = jobRepository.findFilteredJobsBy(dayStart, dayEnd, status, driverId, vehicleId);
 
         // Muudame Entity objektid DTO objektideks
         List<JobDto> jobDtos = jobMapper.toJobDtos(jobs);

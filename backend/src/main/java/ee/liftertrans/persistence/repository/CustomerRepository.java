@@ -17,4 +17,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
             "LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(c.companyName) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<Customer> findBySearchTerm(@Param("search") String search);
+
+    // Kontrollib, kas antud customerId on seotud mõne tööga
+    @Query("SELECT COUNT(j) > 0 FROM Job j WHERE j.customer.id = :customerId")
+    boolean existsJobsByCustomerId(@Param("customerId") Integer customerId);
 }
