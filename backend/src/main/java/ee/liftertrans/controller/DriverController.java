@@ -39,10 +39,44 @@ public class DriverController {
         return driverService.getAllDrivers();
     }
 
+    // lisame loodud meetodi getDriver kohale annotatsioonid, et saaks leitud juhi ühendada URLiga
+    // ja see järel veateated
+    @GetMapping("/drivers/{driverId}")
+    @Operation(summary = "Ühe juhi andmed detailvaate jaoks")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Juhti ei leitud",
+                    content = @Content(
+                            schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "PRIMARY_KEY_NOT_FOUND",
+                                    value = """
+                                            {
+                                              "message": "Ei leidnud primary keyd 'driverId' väärtusega: 99",
+                                              "errorCode": "PRIMARY_KEY_NOT_FOUND"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    public DriverDto getDriver(@PathVariable Integer driverId) {
+        // kui 1 juhi detailvaate jaoks on see 1 juht andmebaasist leitud ja tulemus on tehtud Dto-ks service failis.
+        // nüüd küsime läbi service selle 1 juhi, et controller saaks Dto-ks tehtud andmed anda frondile
+
+        return driverService.getDriver(driverId);
+    }
+
+
     @DeleteMapping("/drivers/{driverId}")
     @Operation(summary = "Juhi kustutamine (ainult kui temaga ei ole seotud töid)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Juht on kustutatud"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Juht on kustutatud"),
+
             @ApiResponse(
                     responseCode = "409",
                     description = "Juhiga on seotud töid, teda ei saa kustutada",

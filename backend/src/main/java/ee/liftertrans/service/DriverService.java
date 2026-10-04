@@ -36,6 +36,18 @@ public class DriverService {
         return driverDtos;
     }
 
+
+    public DriverDto getDriver(Integer driverId) {
+
+        // leiame juhi andmebaasist, kui pole viskab 404 PRIMARY_KEY_NOT_FOUND
+        Driver driver = getValidDriverBy(driverId);
+
+        // Muudame andmebaasist saadud driver vastuse DTO-ks
+        return driverMapper.toDriverDto(driver);
+
+
+    }
+
     public Driver getValidDriverBy(Integer driverId) {
 
         // Otsime juhi ID järgi, kui ei leia, siis 404

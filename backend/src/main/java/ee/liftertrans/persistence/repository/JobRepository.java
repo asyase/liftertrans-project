@@ -21,7 +21,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
               and (:status is null or j.status = :status)
               and (:driverId is null or j.driver.id = :driverId)
               and (:vehicleId is null or j.vehicle.id = :vehicleId)
-            order by j.id
+            order by j.plannedStartTime
             """)
     List<Job> findFilteredJobsBy(Instant dayStart, Instant dayEnd, String status, Integer driverId, Integer vehicleId);
 }
