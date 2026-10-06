@@ -17,4 +17,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
             "LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(c.companyName) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<Customer> findBySearchTerm(@Param("search") String search);
+
+    boolean existsCustomerByCompanyRegistrationNumber(String companyRegistrationNumber);
 }

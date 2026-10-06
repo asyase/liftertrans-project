@@ -1,5 +1,7 @@
 package ee.liftertrans.mapper;
 
+import ee.liftertrans.dto.CustomerCreateRequestDto;
+import ee.liftertrans.dto.CustomerDetailDto;
 import ee.liftertrans.dto.CustomerDto;
 import ee.liftertrans.persistence.entity.Customer;
 import org.mapstruct.Mapper;
@@ -26,4 +28,10 @@ public interface CustomerMapper {
     CustomerDto toCustomerDto(Customer customer);
 
     List<CustomerDto> toCustomerDtos(List<Customer> customers);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    Customer toCustomer(CustomerCreateRequestDto customerCreateRequestDto);
+
+    CustomerDetailDto toCustomerDetailDto(Customer customer);
 }

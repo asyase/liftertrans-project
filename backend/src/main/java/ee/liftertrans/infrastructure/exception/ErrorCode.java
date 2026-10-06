@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
   INVALID_SEARCH_PARAMETER(HttpStatus.BAD_REQUEST, "Otsingu parameeter on pikem kui 100 tähemärki"),
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Kasutaja ei ole sisse logitud"),
-  ACCESS_DENIED(HttpStatus.FORBIDDEN, "Kasutajal puudub ligipääs");
+  ACCESS_DENIED(HttpStatus.FORBIDDEN, "Kasutajal puudub ligipääs"),
+  INVALID_CUSTOMER_DATA(HttpStatus.BAD_REQUEST, "Kliendi andmed on vigased"),
+  CUSTOMER_ALREADY_EXISTS(HttpStatus.CONFLICT, "Sellise registrikoodiga klient on juba olemas");
 
   private final HttpStatus status;
   private final String message;

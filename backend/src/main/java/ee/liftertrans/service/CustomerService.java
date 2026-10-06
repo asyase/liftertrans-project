@@ -1,5 +1,7 @@
 package ee.liftertrans.service;
 
+import ee.liftertrans.dto.CustomerCreateRequestDto;
+import ee.liftertrans.dto.CustomerDetailDto;
 import ee.liftertrans.dto.CustomerDto;
 import ee.liftertrans.infrastructure.exception.BusinessException;
 import ee.liftertrans.infrastructure.exception.ErrorCode;
@@ -9,7 +11,9 @@ import ee.liftertrans.persistence.entity.Customer;
 import ee.liftertrans.persistence.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 
@@ -27,6 +31,25 @@ public class CustomerService {
         var customers = customerRepository.findBySearchTerm(search);
         return customerMapper.toCustomerDtos(customers);
 
+    }
+
+    @Transactional
+    public CustomerDetailDto addCustomer(CustomerCreateRequestDto customerCreateRequestDto) {
+        validateCompanyRegistrationNumberIsAvailable(customerCreateRequestDto.getCompanyRegistrationNumber());
+
+        Customer customer = customerMapper.toCustomer(customerCreateRequestDto);
+        customer.setCreatedAt(Instant.now());
+        Customer savedCustomer = customerRepository.save(customer);
+
+        return customerMapper.toCustomerDetailDto(savedCustomer);
+    }
+
+    // Registrikood on valikuline, seega kontrollime duplikaati ainult siis, kui see on sisestatud
+    private void validateCompanyRegistrationNumberIsAvailable(String companyRegistrationNumber) {
+        if (companyRegistrationNumber != null && !companyRegistrationNumber.isBlank()
+                && customerRepository.existsCustomerByCompanyRegistrationNumber(companyRegistrationNumber)) {
+            throw new BusinessException(ErrorCode.CUSTOMER_ALREADY_EXISTS);
+        }
     }
 
     // Seda kasutab JobService uue tellimuse loomisel, et customerId järgi päris Customer kätte saada

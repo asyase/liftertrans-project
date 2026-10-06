@@ -1,5 +1,6 @@
 package ee.liftertrans.infrastructure;
 
+import ee.liftertrans.dto.CustomerCreateRequestDto;
 import ee.liftertrans.infrastructure.error.ApiError;
 import ee.liftertrans.infrastructure.exception.*;
 import org.jspecify.annotations.NonNull;
@@ -62,9 +63,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull HttpStatusCode status,
             org.springframework.web.context.request.@NonNull WebRequest request) {
 
-        FieldError firstError = ex.getBindingResult().getFieldErrors().getFirst();
-
         ApiError apiError = new ApiError();
+
+        // Kliendi loomise taskis on valideerimisvea jaoks eraldi errorCode ja sõnum
+        if (ex.getBindingResult().getTarget() instanceof CustomerCreateRequestDto) {
+            apiError.setMessage(ErrorCode.INVALID_CUSTOMER_DATA.getMessage());
+            apiError.setErrorCode(ErrorCode.INVALID_CUSTOMER_DATA.name());
+            return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+        }
+
+        FieldError firstError = ex.getBindingResult().getFieldErrors().getFirst();
         apiError.setMessage(firstError.getField() + ": " + firstError.getDefaultMessage());
         apiError.setErrorCode("INCORRECT_INPUT");
 

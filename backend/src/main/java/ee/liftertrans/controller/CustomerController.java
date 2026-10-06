@@ -1,17 +1,25 @@
 package ee.liftertrans.controller;
 
+import ee.liftertrans.dto.CustomerCreateRequestDto;
+import ee.liftertrans.dto.CustomerDetailDto;
 import ee.liftertrans.dto.CustomerDto;
 import ee.liftertrans.infrastructure.error.ApiError;
 import ee.liftertrans.service.CustomerService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -78,5 +86,80 @@ public class CustomerController {
     })
     public List<CustomerDto> getCustomers(@RequestParam(required = false) String search) {
         return customerService.getCustomers(search);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Uue kliendi lisamine (ainult ADMIN). Tagastab loodud kliendi id ja andmed"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Klient on edukalt loodud"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Kliendi andmed on vigased",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "INVALID_CUSTOMER_DATA",
+                                    value = """
+                                            {
+                                              "message": "Kliendi andmed on vigased",
+                                              "errorCode": "INVALID_CUSTOMER_DATA"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Kasutaja pole sisse logitud",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "UNAUTHORIZED",
+                                    value = """
+                                            {
+                                              "message": "Kasutaja ei ole sisse logitud",
+                                              "errorCode": "UNAUTHORIZED"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Kasutajal puudub ligipääs",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "ACCESS_DENIED",
+                                    value = """
+                                            {
+                                              "message": "Kasutajal puudub ligipääs",
+                                              "errorCode": "ACCESS_DENIED"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Sama registrikoodiga klient on juba olemas",
+                    content = @Content(schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "CUSTOMER_ALREADY_EXISTS",
+                                    value = """
+                                            {
+                                              "message": "Sellise registrikoodiga klient on juba olemas",
+                                              "errorCode": "CUSTOMER_ALREADY_EXISTS"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    public CustomerDetailDto addCustomer(@RequestBody @Valid CustomerCreateRequestDto customerCreateRequestDto) {
+        return customerService.addCustomer(customerCreateRequestDto);
     }
 }
