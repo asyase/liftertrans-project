@@ -144,4 +144,55 @@ public class DriverController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/drivers/{driverId}")
+    @Operation(
+            summary = "Juhi andmete muutmine"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Juhi andmed on edukalt muudetud"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Sisendandmed on vigased",
+                    content = @Content(
+                            schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "INCORRECT_INPUT",
+                                    value = """
+                                            {
+                                              "message": "name: must not be blank",
+                                              "errorCode": "INCORRECT_INPUT"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Juhti ei leitud",
+                    content = @Content(
+                            schema = @Schema(implementation = ApiError.class),
+                            examples = @ExampleObject(
+                                    name = "PRIMARY_KEY_NOT_FOUND",
+                                    value = """
+                                            {
+                                              "message": "Ei leidnud primary keyd 'driverId' väärtusega: 99",
+                                              "errorCode": "PRIMARY_KEY_NOT_FOUND"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+
+    public ResponseEntity<Void> updateDriver(@PathVariable Integer driverId,
+                                        @RequestBody @Valid DriverRequestDto driverRequestDto) {
+
+        driverService.updateDriver(driverId, driverRequestDto);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

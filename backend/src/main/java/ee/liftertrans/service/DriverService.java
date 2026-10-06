@@ -50,10 +50,24 @@ public class DriverService {
 
     public Driver getValidDriverBy(Integer driverId) {
 
+
         // Otsime juhi ID järgi, kui ei leia, siis 404
         return driverRepository.findById(driverId)
                 .orElseThrow(() -> new PrimaryKeyNotFoundException("driverId", driverId));
+
+
     }
+
+    public void updateDriver(Integer driverId, DriverRequestDto driverRequestDto){
+
+        Driver driver = getValidDriverBy(driverId);
+        driverMapper.updateDriver(driverRequestDto, driver);
+
+        driverRepository.save(driver);
+
+
+    }
+
 
     // enne kustutamist veendume, et juhiga ei oleks soetud tellimusi. Otsime juhiId järgi
 

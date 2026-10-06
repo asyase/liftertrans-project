@@ -7,6 +7,7 @@ import ee.liftertrans.persistence.entity.Driver;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -27,6 +28,13 @@ public interface DriverMapper {
     Driver toDriver(DriverDto driverDto);
 
     List<DriverDto> driverDtoList(List<Driver> drivers);
+
+
+    @Mapping(target = "id", ignore = true)
+    void updateDriver(DriverRequestDto driverRequestDto, @MappingTarget Driver driver);
+
+
+
 
 }
 
