@@ -30,10 +30,12 @@ public class Vehicle {
     private BigDecimal craneCapacityKg;
     @Column(name = "crane_reach_m", precision = 8, scale = 2)
     private BigDecimal craneReachM;
-    @Column(name = "platform_length_m", precision = 8, scale = 2)
-    private BigDecimal platformLengthM;
-    @Column(name = "platform_width_m", precision = 8, scale = 2)
-    private BigDecimal platformWidthM;
+    @Column(name = "platform_length_mm", precision = 10, scale = 2)
+    private BigDecimal platformLengthMm;
+    @Column(name = "platform_extension_mm", precision = 10, scale = 2)
+    private BigDecimal platformExtensionMm;
+    @Column(name = "platform_width_mm", precision = 10, scale = 2)
+    private BigDecimal platformWidthMm;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subcontractor_id")
     private Subcontractor subcontractor;
@@ -41,11 +43,11 @@ public class Vehicle {
     @NotNull
     @Column(name = "status", nullable = false, length = 20)
     private String status;
-    @Column(name = "vehicle_length_m", precision = 8, scale = 2)
-    private BigDecimal vehicleLengthM;
-    @Column(name = "vehicle_width_m", precision = 8, scale = 2)
-    private BigDecimal vehicleWidthM;
-    @Column(name = "vehicle_height_m", precision = 8, scale = 2)
-    private BigDecimal vehicleHeightM;
+    @Column(name = "vehicle_length_mm", precision = 10, scale = 2)
+    private BigDecimal vehicleLengthMm;
+    @Column(name = "vehicle_width_mm", precision = 10, scale = 2)
+    private BigDecimal vehicleWidthMm;
+    @Column(name = "vehicle_height_mm", precision = 10, scale = 2)
+    private BigDecimal vehicleHeightMm;
 
 }

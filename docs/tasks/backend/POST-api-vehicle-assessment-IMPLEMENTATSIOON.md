@@ -13,10 +13,10 @@
 - `backend/src/main/java/ee/liftertrans/dto/AiAskRequestDto.java` valideerib küsimuse
   `@NotBlank` ja `@Size(max = 500)` abil. Seda DTO-d ei pea uue ressursi jaoks jagama,
   sest selle olemasolev kasutus on seotud `/api/ask` lepinguga.
-- `backend/src/main/java/ee/liftertrans/persistence/entity/Vehicle.java` sisaldab juba
-  sõiduki kaalu-, platvormi- ja staatusevälju (`maxCargoWeightKg`,
-  `platformLengthM`, `platformWidthM`, `status`). Uut sõiduki entiteeti ega
-  andmebaasitabelit nende reeglite jaoks vaja ei ole.
+- `backend/src/main/java/ee/liftertrans/persistence/entity/Vehicle.java` sisaldab
+  sõiduki kandevõime, platvormi mõõtude ja staatuse välju. Platvormi põhipikkus,
+  vajadusel kasutatav pikendus, platvormi laius ning sõiduki üldmõõdud talletatakse
+  millimeetrites; kraana tõstekaugus jääb meetrites ja kaalud kilogrammides.
 - `backend/src/main/java/ee/liftertrans/persistence/repository/VehicleRepository.java`
   pärib `JpaRepository<Vehicle, Integer>`-ist, kuid aktiivsete sõidukite leidmiseks
   eraldi meetodit veel ei ole.
@@ -36,8 +36,10 @@
   mudeli ja väljundi JSON-vormingu. `build.gradle` sisaldab Spring AI Gemini
   sõltuvust.
 - Kraanainfo on olemas `Vehicle` väljadena ning andmebaasis on ka eraldi
-  `crane_capacity` tabel. Kraanaandmed on taski järgi katsetuslikud, seega neid ei
-  kasutata tõstevõime otsustamiseks.
+  `crane_capacity` tabel. Kraana tõstekauguse mõõtepunktid on pärisandmed ning neid
+  võib kasutada ainult täpselt salvestatud kaugusel; vahepealseid väärtusi ei
+  interpoleerita ega ekstrapoleerita. Java poolel pole `crane_capacity` tabeli
+  entiteeti ega repositooriumi veel loodud.
 - Backendi testides on olemas controller'i valideerimise näide
   `backend/src/test/java/ee/liftertrans/controller/DriverControllerTest.java`.
   Veosehindamise endpointi, teenuse ega ärireeglite teste veel ei ole.
@@ -48,22 +50,32 @@
 - Küsimusest mõõtude/kaalu eraldav AI kiht, eraldi promptiressurss ning vastuse
 struktuuri kontroll.
 - Aktiivsete sõidukite repository päring.
+- Kraana mõõtepunktide lugemiseks `crane_capacity` entiteet ja repositoorium.
 - Eraldi veosehindamise teenus, mis arvutab sobivuse deterministlikult ning koostab
   promptist ja andmebaasist saadud info põhjal tulemuse.
 - Uus `POST /api/vehicle-assessment` kontrollerimeetod.
 - Teenuse ärireeglite, sisendite parsimise, endpointi valideerimise ja vigaste AI
   vastuste testid.
-- Enne lõplikku DTO/API lahendust tuleb otsustada, kuidas esitada eri sõidukite puhul
-  erinev üleulatus ning loa/saateauto vajadus. Praeguses näidisvastuses on need
-  väljad tipptasemel, kuigi üleulatus sõltub valitud sõidukist.
+- Platvormi mõõtmeid ületav veos suunatakse käsitsi kontrolli. API ei esita
+  üleulatuse suurust eraldi ega otsusta selle põhjal loa või saateauto vajadust.
 
 ## Sammud
 
-1. **Kasuta olemasolevat sõiduki entiteeti; andmebaasi muudatust pole vaja** —
-   fail: `backend/src/main/java/ee/liftertrans/persistence/entity/Vehicle.java`
-   - Olemasolevad väljad katavad kandevõime, platvormi mõõdud ja staatuse.
-   - Kraana võimekuse jaoks uut loogikat ega andmebaasi muudatusi selle taski käigus
-     ei lisata.
+1. **Uuenda sõiduki mõõtude andmemudelit** —
+   failid: `docs/database/2_create.sql`,
+   `docs/database/3_import.sql`,
+   `backend/src/main/java/ee/liftertrans/persistence/entity/Vehicle.java`
+   - Sõiduki üldmõõdud ning platvormi põhipikkus ja laius salvestatakse millimeetrites.
+   - Lisa platvormi pikenduse pikkusele eraldi millimeetriväli; pikendus on valikuline
+     ega tähenda, et see oleks alati kasutuses.
+   - Kraana tõstekaugus jääb meetritesse ning kaalud kilogrammides.
+   - Uuenda algandmetes sõidukit 816FTF (Scania R400): kandevõime 8670 kg,
+     auto mõõdud 11400 × 2550 × 3900 mm, platvorm 7500 × 2550 mm ja pikendus 1500 mm.
+     Kraana mõõtepunktid talleta `crane_capacity` tabelis: 4 m / 13000 kg ja
+     18 m / 2700 kg. Need on pärisandmed ning neid kasutatakse täpselt vastava
+     tõstekauguse korral.
+   - Veose mõõtude tabeli ühikuid see muudatus ei muuda; enne võrdlust tuleb ühikud
+     ühtlustada.
 
 2. **Lisa aktiivsete sõidukite päring** —
    fail: `backend/src/main/java/ee/liftertrans/persistence/repository/VehicleRepository.java`
@@ -82,7 +94,7 @@ struktuuri kontroll.
    - Request DTO sisaldab `question` välja ning `@NotBlank` ja `@Size(max = 500)`
      valideerimist.
    - Response DTO modelleerib taskis määratud `status`, `answer`, sõidukid,
-     üleulatuse/loa/saateauto hinnangu, kraanahinnangu ning puuduva info.
+     kraanahinnangu ning puuduva info.
    - Sõiduki DTO väljastab ainult kliendile vajalikke välju, näiteks
      registreerimisnumbri ja mudeli nime. Kandevõime ja muud siseandmed jäävad
      hindamisloogika kasutusse, kui neid pole kliendile teadlikult vaja näidata.
@@ -114,18 +126,30 @@ struktuuri kontroll.
 
 6. **Loo eraldi veosehindamise teenus** —
    fail: `backend/src/main/java/ee/liftertrans/service/VehicleAssessmentService.java`
-   - Võta sõltuvustena aktiivsete sõidukite repository, sõidukite mapper ning
-     küsimuse väljade eraldamise komponent. Ära kutsu `NlToSqlService`-it.
+   - Enne teenuse kraanahinnangu osa loomist loo `crane_capacity` tabelile JPA
+     entiteet ja repositoorium, kui neid pole. Repositoorium peab võimaldama lugeda
+     valitud sõiduki mõõtepunktid.
+   - Võta sõltuvustena aktiivsete sõidukite repository, kraana mõõtepunktide
+     repository, sõidukite mapper ning küsimuse väljade eraldamise komponent. Ära
+     kutsu `NlToSqlService`-it.
    - Töövoog: kontrolli küsimust → eralda mõõdud ja kaal → puuduva info korral
-     tagasta `NEED_MORE_INFORMATION` → leia aktiivsed sõidukid → rakenda kaalu,
-     platvormi ja üleulatuse reegleid deterministlikult → koosta vastus.
-   - Üleulatus on sõidukipõhine: `max(0, cargoLength - platformLength)`. Reeglid:
-     0 m = selle reegli alusel luba/saateautot pole; üle 0 kuni 2 m = eriluba;
-     üle 2 kuni 5 m = üks saateauto; üle 5 m = käsitsi kontroll.
-   - Kaalu ületavad sõidukid ei sobi. Laiuse ületamist ei teisendata pikkuse
-     üleulatuse reegliks; suuna määratlemata mõõtude paigutus käsitsi kontrolli.
-   - Kraana tabeli või sõiduki kraanaväljade põhjal ei kinnitata tõstevõimet.
-     Tõstevajaduse korral märgi kraana hinnang käsitsi kinnitatavaks.
+     tagasta `NEED_MORE_INFORMATION` → leia aktiivsed sõidukid → võrdle kaalu ja
+     mõõte sõiduki piirangutega → kui veose pikkus või laius ületab platvormi vastavat
+     mõõtu või sobivus pole kindel, suuna juhtum `NEEDS_MANUAL_REVIEW` staatusega
+     käsitsi kontrolli → koosta vastus.
+   - Süsteem ei arvuta ega kirjelda üleulatuse suurust ega otsusta selle põhjal
+     eriloa või saateauto vajadust; need asjaolud tuleb käsitsi üle kontrollida.
+   - Kaalu ületavad sõidukid ei sobi. Puuduvate või ebaselgete mõõtude korral ära
+     oletada sobivust.
+   - Kraana tõstevõimet hinnatakse ainult siis, kui soovitud tõstekaugusele leidub
+     täpne rida `crane_capacity` tabelis; võrdle selle rea kilogrammivõimet veose
+     kaaluga.
+   - Kui täpset tõstekauguse rida pole, märgi kraana hinnang käsitsi kinnitatavaks.
+     Ära interpoleeri ega ekstrapoleeri tõstevõimet mõõtepunktide vahel või neist
+     väljapoole.
+   - Sõiduki üldised kraanaväljad ei asenda tõstekauguse kaupa salvestatud mõõtepunkti.
+     Isegi sobiv mõõtepunkt annab ainult eelhinnangu, mitte lõpliku töö teostatavuse
+     kinnituse.
    - Kui mudeli vastust ei saa sisemise DTO järgi parsida või vajalikud väljad on
      vigased, lõpeta päring veaga; ära tagasta edukat asendusotsust ega väljamõeldud
      väärtusi.
@@ -164,10 +188,11 @@ struktuuri kontroll.
     fail: `backend/src/test/java/ee/liftertrans/service/VehicleAssessmentServiceTest.java`
     - Testi ärireegleid eraldi AI-st ja päris andmebaasist, kasutades mockitud
       väljade eraldajat ja repository tulemust.
-    - Katta aktiivse sõiduki valik, kaalu sobivus, mõõtude kontroll ning üleulatuse
-      piirid: 0 m, üle 0 m, täpselt 2 m, üle 2 m, täpselt 5 m ja üle 5 m.
-    - Katta laiuse ületamise käsitsi kontroll, puuduva sisendi küsimine ning
-      kraanatõste käsitsi kinnitamine.
+    - Katta aktiivse sõiduki valik, kaalu sobivus, platvormi pikkuse või laiuse
+      ületamisel käsitsi kontroll, puuduva sisendi küsimine, kraana täpse
+      mõõtepunkti kaaluvõrdlus nii mõõdetud piiri sees kui sellest üle, mõõtepunktide
+      vahele jääva ja mõõdetud vahemikust väljas oleva tõstekauguse korral käsitsi
+      kinnitamine.
     - Kontrolli, et mudeli vigane või puudulik väljund ei tekita edukat hinnangut.
 
 11. **Lisa controller'i testid** —
@@ -210,13 +235,10 @@ struktuuri kontroll.
   olemasolevat `/api/ask` endpointi selleks ei muudeta.
 - Endpointi autentimine või avalik kasutus ning avaliku endpointi päringupiirangud
   vajavad endiselt otsust enne päris klientidele avamist.
-- Taski näidisvastuses on `overhangM`, eriloa vajadus ja saateautode arv
-  tipptasemel väljad. Need väärtused sõltuvad valitud sõidukist ning sobivaid
-  sõidukeid võib olla mitu. Soovitatav on viia need väljad iga sõiduki hinnangu
-  juurde või tagastada üks sõiduk korraga; API kuju tuleb enne DTO loomist kinnitada.
-- Task ei määratle, kas veose pikkuse ja laiuse suunda tohib platvormile sobitamisel
-  pöörata. Samuti pole määratletud, kuidas jaotub üleulatus platvormi esi- ja
-  tagaotsa vahel. Need asjaolud mõjutavad sõidukipõhist hinnangut.
+- Platvormi mõõtmeid ületav veos suunatakse käsitsi kontrolli; API ei kirjelda
+  üleulatuse suurust eraldi ega otsusta selle põhjal loa või saateauto vajadust.
+- Kui veose pikkuse ja laiuse suunda võib platvormile sobitamisel pöörata, tuleb
+  ebaselge sobivus käsitsi kontrollida.
 - Kui andmebaasis aktiivse sõiduki kaalu- või platvormiväärtus on `null`, tuleb
   kinnitada, kas seda sõidukit eirata või käsitsi kontrolli suunata. Puuduvat
   sõidukiandmestikku ei tohi tõlgendada piiranguteta võimekusena.

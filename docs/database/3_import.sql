@@ -68,28 +68,30 @@ INSERT INTO vehicle (
     max_cargo_weight_kg,
     crane_capacity_kg,
     crane_reach_m,
-    platform_length_m,
-    platform_width_m,
+    platform_length_mm,
+    platform_extension_mm,
+    platform_width_mm,
     subcontractor_id,
     status,
-    vehicle_length_m,
-    vehicle_width_m,
-    vehicle_height_m
+    vehicle_length_mm,
+    vehicle_width_mm,
+    vehicle_height_mm
 ) VALUES
       (
           1,
-          '876HGF',
-          'MAN TGS 35.480',
-          18000.00,
+          '816FTF',
+          'Scania R400',
+          8670.00,
           NULL,
           NULL,
-          8.50,
-          2.50,
+          7500.00,
+          1500.00,
+          2550.00,
           NULL,
           'ACTIVE',
-          9.60,
-          2.55,
-          3.90
+          11400.00,
+          2550.00,
+          3900.00
       ),
       (
           2,
@@ -98,13 +100,14 @@ INSERT INTO vehicle (
           15000.00,
           NULL,
           NULL,
-          7.50,
-          2.50,
+          7500.00,
+          NULL,
+          2500.00,
           NULL,
           'ACTIVE',
-          9.10,
-          2.55,
-          3.80
+          9100.00,
+          2550.00,
+          3800.00
       ),
       (
           3,
@@ -113,13 +116,14 @@ INSERT INTO vehicle (
           12000.00,
           NULL,
           NULL,
-          7.00,
-          2.45,
+          7000.00,
+          NULL,
+          2450.00,
           NULL,
           'IN_SERVICE',
-          8.80,
-          2.50,
-          3.70
+          8800.00,
+          2500.00,
+          3700.00
       );
 
 
@@ -133,10 +137,8 @@ INSERT INTO crane_capacity (
     max_weight_kg,
     vehicle_id
 ) VALUES
-      (1, 5.00, 8000.00, 1),
-      (2, 10.00, 5000.00, 1),
-      (3, 15.00, 2500.00, 1),
-      (4, 18.00, 1500.00, 1),
+      (1, 4.00, 13000.00, 1),
+      (2, 18.00, 2700.00, 1),
       (5, 5.00, 6500.00, 2),
       (6, 10.00, 4000.00, 2),
       (7, 15.00, 2000.00, 2);
@@ -264,13 +266,14 @@ INSERT INTO vehicle (
     max_cargo_weight_kg,
     crane_capacity_kg,
     crane_reach_m,
-    platform_length_m,
-    platform_width_m,
+    platform_length_mm,
+    platform_extension_mm,
+    platform_width_mm,
     subcontractor_id,
     status,
-    vehicle_length_m,
-    vehicle_width_m,
-    vehicle_height_m
+    vehicle_length_mm,
+    vehicle_width_mm,
+    vehicle_height_mm
 ) VALUES
     (
         4,
@@ -279,13 +282,14 @@ INSERT INTO vehicle (
         16000.00,
         NULL,
         NULL,
-        8.00,
-        2.50,
+        8000.00,
+        NULL,
+        2500.00,
         1,
         'ACTIVE',
-        9.30,
-        2.55,
-        3.85
+        9300.00,
+        2550.00,
+        3850.00
     );
 
 INSERT INTO crane_capacity (

@@ -1,5 +1,6 @@
 package ee.liftertrans.mapper;
 
+import ee.liftertrans.dto.VehicleAssessmentVehicleDto;
 import ee.liftertrans.dto.VehicleDto;
 import ee.liftertrans.persistence.entity.Vehicle;
 import org.mapstruct.Mapper;
@@ -17,5 +18,13 @@ public interface VehicleMapper {
     VehicleDto toVehicleDto(Vehicle vehicle);
 
     List<VehicleDto> toVehicleDtos(List<Vehicle> vehicles);
+
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "registrationNumber", target = "registrationNumber")
+
+    VehicleAssessmentVehicleDto toVehicleAssessmentVehicleDto(Vehicle vehicle);
+
+    //teisendab sõidukite loendi sobivushinnangu loendiks
+    List<VehicleAssessmentVehicleDto> toVehicleAssessmentVehicleDtos(List<Vehicle> vehicles);
 
 }

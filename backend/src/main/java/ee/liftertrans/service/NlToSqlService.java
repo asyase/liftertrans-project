@@ -47,13 +47,14 @@ public class NlToSqlService {
             registration_number VARCHAR(20) NOT NULL,
             name VARCHAR(100), -- model, e.g. 'Volvo FM'
             max_cargo_weight_kg DECIMAL(10,2),
-            platform_length_m DECIMAL(8,2),
-            platform_width_m DECIMAL(8,2),
+            platform_length_mm DECIMAL(10,2),
+            platform_extension_mm DECIMAL(10,2),
+            platform_width_mm DECIMAL(10,2),
             subcontractor_id INTEGER, -- NULL = own vehicle, otherwise subcontractor's vehicle
             status VARCHAR(20) NOT NULL, -- 'ACTIVE', 'IN_SERVICE', 'UNAVAILABLE', 'INACTIVE'
-            vehicle_length_m DECIMAL(8,2),
-            vehicle_width_m DECIMAL(8,2),
-            vehicle_height_m DECIMAL(8,2)
+            vehicle_length_mm DECIMAL(10,2),
+            vehicle_width_mm DECIMAL(10,2),
+            vehicle_height_mm DECIMAL(10,2)
         )
 
         -- Crane lifting capacity: how many kg the vehicle's crane lifts at a given reach

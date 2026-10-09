@@ -141,8 +141,11 @@ See osa aitab prompti ja chatbot'i ülesannet mõista. Seda osa ei saadeta mudel
 
 Grounding tähendab, et AI kasutab vastamisel rakenduse antud usaldusväärseid andmeid,
 mitte ei mõtle neid ise välja. Selles promptis eraldab AI ainult kliendi öeldud
-kaubaandmeid. Hiljem hangib rakendus sobivad sõidukid andmebaasist ja kontrollib
-kaalu, mõõte ning üleulatuse reegleid ise.
+kaubaandmeid. Hiljem hangib rakendus sõidukid andmebaasist ja võrdleb kaalu ning
+mõõte sõiduki piirangutega. Kui veose mõõt ületab platvormi vastavat mõõtu või
+sobivust ei saa kindlalt hinnata, suunatakse juhtum käsitsi kontrolli. Üleulatuse
+suurust eraldi ei arvutata ega kirjeldata ning selle põhjal ei otsustata loa või
+saateauto vajadust.
 
 ### Chain of Thought ehk sisemine arutlus
 

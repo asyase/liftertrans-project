@@ -6,13 +6,14 @@ Luua väliskliendile mõeldud vestluslik päring, mille kaudu klient kirjeldab k
 ja mõõtmeid ning soovitud tõstekõrgust. Süsteem kasutab küsimusest vajalike andmete
 leidmiseks AI-d ja võrdleb veoseandmeid andmebaasis olevate sõidukite andmetega. Vastus
 peab arusaadavalt ütlema, kas andmete põhjal leidub sobiv sõiduk, kas kehtib eriloa või
-saateauto reegel või vajab juhtum käsitsi kontrolli.
+kas mõõtude, kraana või muu asjaolu tõttu vajab juhtum käsitsi kontrolli.
 
-Selles taskis käsitletakse andmebaasi sõidukiandmeid pärisandmetena. Andmebaasi kraana
-võimekuse andmed on praegu katsetuslikud ega sobi tõstevõime kinnitamiseks. Seetõttu ei
-tohi süsteem kraana võimekuse või soovitud tõstekõrguse põhjal anda kindlat lubadust, et
-tõstmine on võimalik. Sellisel juhul peab vastus selgelt ütlema, et tõstevõime vajab
-käsitsi kinnitamist.
+Selles taskis käsitletakse andmebaasi sõiduki- ja kraanaandmeid pärisandmetena. Kraana
+tõstevõime andmed on mõõdetud kindlatel tõstekaugustel; automaatses eelhinnangus võib
+kasutada ainult andmebaasis täpselt olemasolevale tõstekaugusele vastavat mõõtepunkti.
+Vahepealsetele või andmebaasis puudu olevatele tõstekaugustele ei tohi võimekust
+interpoleerida ega ekstrapoleerida — need tuleb käsitsi kinnitada. Eelhinnang ei ole
+siiski lõplik töö teostatavuse kinnitus.
 
 See on sobivuse **eelhinnang**, mitte lõplik hinnapakkumine, transpordiluba ega töö
 teostatavuse kinnitus.
@@ -56,9 +57,6 @@ soovituslik kuju:
       "name": "Sõiduki mudel"
     }
   ],
-  "overhangM": 0.0,
-  "specialPermitRequired": false,
-  "escortVehiclesRequired": 0,
   "craneAssessment": "MANUAL_CONFIRMATION",
   "missingInformation": []
 }
@@ -68,10 +66,17 @@ Võimalikud `status` väärtused:
 
 | Väärtus | Tähendus |
 |---|---|
-| `POSSIBLE` | Sõiduki andmed vastavad hinnatavate transpordipiirangute tingimustele; kraanaga tõstmine ei ole selle staatusega automaatselt kinnitatud. |
+| `POSSIBLE` | Sõiduki andmed vastavad automaatselt hinnatavatele transporditingimustele; kraana tulemust kirjeldab eraldi `craneAssessment`. |
 | `NOT_POSSIBLE` | Ükski aktiivne sõiduk ei vasta andmebaasis olevate transpordipiirangute alusel veose kaalule või platvormi mõõtudele. |
 | `NEED_MORE_INFORMATION` | Küsimusest puudub üks või mitu vajalikku sisendandmetest ning kliendilt tuleb neid küsida. |
 | `NEEDS_MANUAL_REVIEW` | Juhtum ületab määratud automaatse hindamise piire või nõuab kraana/tõstekõrguse käsitsi kinnitamist. |
+
+`craneAssessment` kirjeldab tõsteosa transpordihinnangust eraldi. Selle väärtused on
+`NOT_REQUIRED` (tõstmist pole vaja), `WITHIN_MEASURED_CAPACITY` (täpsel mõõdetud
+tõstekaugusel jääb veose kaal mõõdetud võimekuse sisse), `EXCEEDS_MEASURED_CAPACITY`
+(täpsel mõõdetud tõstekaugusel ületab kaal mõõdetud võimekuse) ja
+`MANUAL_CONFIRMATION` (täpset tõstekauguse mõõtepunkti pole või tõsteosa vajab muud
+käsitsi kontrolli). Mõõtepunkti tulemus on eelhinnang, mitte töö lõplik kinnitus.
 
 `vehicles` sisaldab ainult hindamise seisukohast sobivaid aktiivseid sõidukeid. Kui
 sobivaid sõidukeid ei leita, on väärtuseks tühi massiiv. `answer` on kliendile mõeldud
@@ -91,29 +96,26 @@ vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
 
 1. Sõiduki valikul arvestatakse ainult `ACTIVE` staatusega sõidukeid.
 2. Veose kaal ei tohi ületada sõiduki `max_cargo_weight_kg` väärtust.
-3. Veose mõõte võrreldakse sõiduki platvormi pikkuse ja laiusega (`platform_length_m`,
-   `platform_width_m`). Hindamine peab kasutama andmebaasist saadud väärtusi ega tohi
-   lasta AI-l sõidukiandmeid välja mõelda.
-4. Pikisuunaline üleulatus arvutatakse veose pikkuse ja sõiduki platvormi pikkuse
-   vahena; kui veos platvormist pikem ei ole, on üleulatus 0 m. Käesoleva taski
-   üleulatuse reeglid kehtivad pikkusele, mitte laiusele.
-5. Pikisuunalise üleulatuse reeglid:
-
-| Üleulatus | Tulemus |
-|---|---|
-| 0 m | Eriloa ega saateauto nõuet selle reegli alusel ei teki. |
-| Üle 0 m kuni 2 m (kaasa arvatud) | `specialPermitRequired = true`; saateautode arv on 0. |
-| Üle 2 m kuni 5 m (kaasa arvatud) | `escortVehiclesRequired = 1`; eriloa vajadust ei tuletata selle reegli põhjal automaatselt. |
-| Üle 5 m | Automaatset sobivusotsust ei anta; `NEEDS_MANUAL_REVIEW`. |
-
-6. Kui veose laius ületab platvormi laiuse või mõõtmeid ei saa kindlalt platvormile
-   sobitada, ei tohi pikkuse üleulatuse reegleid laiusele üle kanda. Juhtum märgitakse
-   käsitsi kontrollitavaks, kuni laiuse käsitlemise reeglid on kinnitatud.
-7. Kraana tabeli `reach_m` ja `max_weight_kg` väärtused on katsetuslikud. Neid ei
-   kasutata tõstevõime lubaduse andmiseks. Kui klient vajab tõstmist, sh kirjeldab
-   soovitud tõstekõrgust, märgitakse `craneAssessment = "MANUAL_CONFIRMATION"` ja
-   vastuses öeldakse selgelt, et tõstevõime tuleb üle kontrollida.
-8. Sõiduki transpordisobivus ja kraanaga tõstmise sobivus on vastuses eristatavad.
+3. Veose mõõdud teisendatakse enne võrdlemist sõiduki mõõtudega samasse ühikusse.
+   Sõiduki platvormi põhipikkus, vajadusel kasutatav pikendus ja laius on andmebaasis
+   millimeetrites (`platform_length_mm`, `platform_extension_mm`,
+   `platform_width_mm`); sõiduki üldmõõdud on samuti millimeetrites. Hindamine peab
+   kasutama andmebaasist saadud väärtusi ega tohi lasta AI-l sõidukiandmeid välja
+   mõelda.
+4. Kui veose pikkus või laius ületab platvormi vastavat mõõtu või mõõtude sobivust ei
+   saa kindlalt hinnata, suunatakse juhtum käsitsi kontrolli
+   (`NEEDS_MANUAL_REVIEW`). Süsteem ei arvuta ega kirjelda üleulatuse suurust ega
+   järelda sellest eriloa või saateauto vajadust; need asjaolud tuleb käsitsi üle
+   kontrollida.
+5. Kraana tabeli `crane_capacity` tõstekaugus `reach_m` on meetrites ja
+   `max_weight_kg` kilogrammides. Kui kliendi soovitud tõstekaugus vastab täpselt
+   andmebaasis olevale mõõtepunktile, võrdle veose kaalu selle punkti tõstevõimega ning
+   väljasta vastav kraanahinnang. Kui täpset mõõtepunkti pole, märgi
+   `craneAssessment = "MANUAL_CONFIRMATION"` ja ütle, et tõstevõime tuleb käsitsi üle
+   kontrollida. Ära interpoleeri ega ekstrapoleeri mõõtepunktide vahel ega väljapoole
+   mõõdetud vahemikku. Ka mõõtepunktiga sobiv tulemus on eelhinnang, mitte lõplik
+   teostatavuse kinnitus.
+6. Sõiduki transpordisobivus ja kraanaga tõstmise sobivus on vastuses eristatavad.
    Sobiv veok ei tähenda automaatselt, et kraanaga tõstmine on teostatav.
 
 ## AI ja prompti nõuded
@@ -129,8 +131,7 @@ vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
    `backend/src/main/resources/prompts/vehicle-assessment-system-prompt.md`, mitte Java
    koodis tekstikonstandina.
 5. Prompt peab sisaldama vähemalt ühte näidet ehk one-shot/few-shot näiteid, sealhulgas
-   sobiva sõiduki juhtumit ning üle 5 m üleulatuse või tõstmist vajava juhtumi käsitsi
-   kontrolli.
+   mõõtude eraldamist ning tõstmist vajava juhtumi käsitsi kinnitamise vajadust.
 6. Mudelilt küsitakse ainult lühikest kasutajale sobivat põhjendust; sisemist Chain of
    Thought arutluskäiku ei väljastata ega salvestata API vastusena.
 7. API vastus on struktureeritud ning valideeritakse enne kliendile väljastamist.
@@ -170,24 +171,20 @@ vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
   täpsustust ning tagastab `NEED_MORE_INFORMATION`.
 - [ ] Sõiduki otsus kasutab andmebaasi sõidukiandmeid ja valib ainult `ACTIVE`
   sõidukeid.
-- [ ] Sõidukit ei märgita transpordiks sobivaks, kui veose kaal ületab selle
-  kandevõimet või mõõdud ei mahu hinnatavate platvormipiiride sisse, arvestades allpool
-  kirjeldatud üleulatuse juhtumeid.
-- [ ] Üle 0 m kuni 2 m (kaasa arvatud) pikisuunalise üleulatuse korral märgitakse
-  eriloa vajadus.
-- [ ] Üle 2 m kuni 5 m (kaasa arvatud) pikisuunalise üleulatuse korral märgitakse ühe
-  saateauto vajadus.
-- [ ] Täpselt 2 m üleulatus kuulub eriloa vahemikku; täpselt 5 m kuulub ühe saateauto
-  vahemikku.
-- [ ] Üle 5 m üleulatuse korral tagastatakse `NEEDS_MANUAL_REVIEW`, mitte automaatne
-  positiivne hinnang.
-- [ ] Laiuse ületamisele ei rakendata pikkuse üleulatuse reegleid; määratlemata juhtum
-  suunatakse käsitsi kontrolli.
-- [ ] Kraana katsetusandmete põhjal ei anta tõstmise kohta kindlat „saab“ lubadust;
-  tõstmist vajava päringu vastuses märgitakse käsitsi kinnitamise vajadus.
+- [ ] Kaalupiirangut ületavat sõidukit ei märgita sobivaks.
+- [ ] Kui veose pikkus või laius ületab platvormi vastavat mõõtu või mõõtude sobivust
+  ei saa kindlalt hinnata, suunatakse juhtum käsitsi kontrolli
+  (`NEEDS_MANUAL_REVIEW`).
+- [ ] Süsteem ei arvuta ega kirjelda üleulatuse suurust ega järelda sellest eriloa või
+  saateauto vajadust; need asjaolud tuleb käsitsi üle kontrollida.
+- [ ] Täpselt mõõdetud kraana tõstekaugusel kasutatakse vastava andmebaasirea
+  tõstevõimet veose kaaluga võrdlemiseks.
+- [ ] Vahepealse, puuduva või mõõdetud vahemikust väljapoole jääva tõstekauguse korral
+  märgitakse kraana hinnang käsitsi kinnitatavaks; väärtusi ei interpoleerita ega
+  ekstrapoleerita.
+- [ ] Kraanahinnang jääb eelhinnanguks ega anna lõplikku töö teostatavuse lubadust.
 - [ ] Vastus sisaldab fikseeritud struktuuriga staatust, kliendile mõeldud selgitust,
-  sobivaid sõidukeid, üleulatuse/loa/saateauto hinnangut, kraana hinnangu staatust ja
-  vajadusel puuduvaid andmeid.
+  sobivaid sõidukeid, kraana hinnangu staatust ja vajadusel puuduvaid andmeid.
 - [ ] AI ei tagasta SQL-i, süsteemiprompti ega andmebaasist küsimusega mitteseotud
   andmeid.
 - [ ] Prompt asub Markdown-failis, sisaldab süsteemi- ja kasutajarolli juhiseid ning
@@ -196,8 +193,10 @@ vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
 - [ ] AI või andmebaasi tõrke korral tagastub veavastus; süsteem ei anna väljamõeldud
   edukat hinnangut.
 - [ ] Automaat- ja/või integratsioonitestid katavad puuduva sisendi, kaalu- ja
-  platvormipiirid, aktiivse sõiduki valiku, üleulatuse piirid (0 m, 2 m, üle 2 m, 5 m,
-  üle 5 m), käsitsi kontrolli ning AI vigase vastuse.
+  platvormipiirid, aktiivse sõiduki valiku, platvormi mõõtude ületamisel käsitsi
+  kontrolli, täpsete kraana mõõtepunktide kaaluvõrdluse nii sobiva kui ületatud kaalu
+  korral, vahepealse ja mõõdetud vahemikust väljas oleva tõstekauguse käsitsi
+  kinnitamise ning AI vigase vastuse.
 
 ## Avatud küsimused
 
@@ -207,10 +206,7 @@ vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
 - Kas endpoint peab olema avalik või nõuab autentimist/rate limit'it? Praegune
   `/api/ask` ei kontrolli backendis ADMIN rolli; uue väliskliendi endpointi ligipääs
   tuleb turvaliselt määratleda enne avalikku kasutust.
-- Kas veose mõõte võib platvormile paigutamisel pöörata? Task eeldab, et sobivust
-  kontrollitakse pikkuse ja laiuse mõistliku orientatsiooniga, kuid täpne
-  pööramise/koorma paigutamise reegel tuleb enne lõplikku rakendamist kinnitada.
-- Milline on ametlik eriloa käsitlus laiuse ületamisel? Käesolev ülesanne suunab
-  määratlemata laiusejuhtumid käsitsi kontrolli.
+- Kui veose pikkuse ja laiuse suunda võib platvormile sobitamisel pöörata, tuleb see
+  käsitsi kontrollida; süsteem ei arvuta ega kirjelda üleulatuse suurust.
 - Kas klient sisestab küsimuse vabatekstina või peaks tulevikus kasutajaliides mõõdud
   ja kaalu eraldi väljadena küsima? Käesolev endpoint kasutab vabatekstilist küsimust.
