@@ -1,7 +1,7 @@
 package ee.liftertrans.controller;
 
-import ee.liftertrans.dto.AiAskRequestDto;
-import ee.liftertrans.dto.AiAskResponseDto;
+import ee.liftertrans.ai.AiAskRequestDto;
+import ee.liftertrans.ai.AiAskResponseDto;
 import ee.liftertrans.service.NlToSqlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

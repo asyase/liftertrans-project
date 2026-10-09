@@ -1,4 +1,4 @@
-package ee.liftertrans.dto;
+package ee.liftertrans.ai;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

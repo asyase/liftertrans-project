@@ -1,6 +1,6 @@
 package ee.liftertrans.service;
 
-import ee.liftertrans.dto.AiAskResponseDto;
+import ee.liftertrans.ai.AiAskResponseDto;
 import ee.liftertrans.infrastructure.exception.IncorrectInputException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.jdbc.core.ColumnMapRowMapper;

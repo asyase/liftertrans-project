@@ -1,4 +1,4 @@
-package ee.liftertrans.dto;
+package ee.liftertrans.ai;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
