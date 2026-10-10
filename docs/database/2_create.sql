@@ -168,7 +168,7 @@ CREATE TABLE vehicle (
                          id int  NOT NULL,
                          registration_number varchar(20)  NOT NULL,
                          name varchar(100)  NULL,
-                         max_cargo_weight_kg decimal(10,2)  NULL,
+                         max_cargo_weight_kg decimal(10,2)  NOT NULL,
                          crane_capacity_kg decimal(10,2)  NULL,
                          crane_reach_m decimal(8,2)  NULL,
                          platform_length_mm decimal(10,2)  NULL,

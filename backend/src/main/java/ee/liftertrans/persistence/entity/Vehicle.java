@@ -24,7 +24,8 @@ public class Vehicle {
     @Size(max = 100)
     @Column(name = "name", length = 100)
     private String name;
-    @Column(name = "max_cargo_weight_kg", precision = 10, scale = 2)
+    @NotNull
+    @Column(name = "max_cargo_weight_kg", nullable = false, precision = 10, scale = 2)
     private BigDecimal maxCargoWeightKg;
     @Column(name = "crane_capacity_kg", precision = 10, scale = 2)
     private BigDecimal craneCapacityKg;
