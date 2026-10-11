@@ -66,10 +66,10 @@ Võimalikud `status` väärtused:
 
 | Väärtus | Tähendus |
 |---|---|
-| `POSSIBLE` | Sõiduki andmed vastavad automaatselt hinnatavatele transporditingimustele; kraana tulemust kirjeldab eraldi `craneAssessment`. |
-| `NOT_POSSIBLE` | Ükski aktiivne sõiduk ei vasta andmebaasis olevate transpordipiirangute alusel veose kaalule või platvormi mõõtudele. |
-| `NEED_MORE_INFORMATION` | Küsimusest puudub üks või mitu vajalikku sisendandmetest ning kliendilt tuleb neid küsida. |
-| `NEEDS_MANUAL_REVIEW` | Juhtum ületab määratud automaatse hindamise piire või nõuab kraana/tõstekõrguse käsitsi kinnitamist. |
+| `POSSIBLE` | Andmebaasi sõidukiandmete põhjal leidub automaatselt sobiv sõiduk; kraana tulemust kirjeldab eraldi `craneAssessment`. |
+| `NOT_POSSIBLE` | Võib kasutada alles siis, kui käsitsi kontrolli järel on kinnitatud, et sobivat lahendust ei ole. Automaatne eelhinnang seda staatust ei tagasta. |
+| `NEED_MORE_INFORMATION` | Reserveeritud staatus. Puuduva vajaliku info korral suunatakse päring käsitsi ülevaatamisele staatusega `NEEDS_MANUAL_REVIEW`. |
+| `NEEDS_MANUAL_REVIEW` | Automaatne hinnang ei saa kindlat vastust anda: vajalik info puudub, sobivat aktiivset sõidukit ei leitud või mõõdud/kraana vajavad kontrolli. |
 
 `craneAssessment` kirjeldab tõsteosa transpordihinnangust eraldi. Selle väärtused on
 `NOT_REQUIRED` (tõstmist pole vaja), `WITHIN_MEASURED_CAPACITY` (täpsel mõõdetud
@@ -87,10 +87,12 @@ eestikeelne selgitus. Vastuses ei väljastata SQL-i.
 | HTTP | Olukord |
 |---|---|
 | 400 | Puuduv, tühi või üle lubatud pikkuse küsimus; kasutada projekti tavapärast valideerimise veavormingut. |
+| 429 | IP-aadress on ületanud 5 päringut minutis või 30 päringut tunnis; vastuses on `Retry-After` päis. |
 | 500 | AI teenuse või andmebaasi ootamatu rike; tagastada projekti tavapärane veavorming, mitte väljamõeldud sobivushinnang. |
 
 Kui küsimus on sisult arusaamatu või vajalikud mõõdud/kaal puuduvad, on see edukas
-vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
+vastus staatusega `NEEDS_MANUAL_REVIEW`, mitte serveri viga. Puuduvaid väärtusi ei oletata
+ning automaatvastus ei maini võimalikke teenusepakkujaid ega luba lahenduse leidmist.
 
 ## Hindamise ärireeglid
 
@@ -116,7 +118,11 @@ vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
    mõõdetud vahemikku. Ka mõõtepunktiga sobiv tulemus on eelhinnang, mitte lõplik
    teostatavuse kinnitus.
 6. Sõiduki transpordisobivus ja kraanaga tõstmise sobivus on vastuses eristatavad.
-   Sobiv veok ei tähenda automaatselt, et kraanaga tõstmine on teostatav.
+    Sobiv veok ei tähenda automaatselt, et kraanaga tõstmine on teostatav.
+7. Kui automaatselt sobivat aktiivset sõidukit ei leita või päringu hindamiseks vajalik
+   info puudub, suunatakse kogu päring käsitsi ülevaatamisele (`NEEDS_MANUAL_REVIEW`).
+   Automaatvastus ei maini alltöövõtjaid ega muid võimalikke teenusepakkujaid ega luba,
+   et alternatiivne lahendus kindlasti leidub.
 
 ## AI ja prompti nõuded
 
@@ -167,14 +173,17 @@ vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
   `/api/ask` SQL-vastuse leping jääb sellest eraldi.
 - [ ] Requesti küsimus on kohustuslik ning kuni 500 tähemärki; vigase sisendi korral
   tagastub 400 projekti tavapärases vormingus.
-- [ ] Kui kaal, pikkus või laius puudub, ei oletata puuduvat väärtust; vastus küsib
-  täpsustust ning tagastab `NEED_MORE_INFORMATION`.
+- [ ] Kui hindamiseks vajalik info puudub, ei oletata väärtusi; päring suunatakse
+  käsitsi ülevaatamisele staatusega `NEEDS_MANUAL_REVIEW`.
 - [ ] Sõiduki otsus kasutab andmebaasi sõidukiandmeid ja valib ainult `ACTIVE`
   sõidukeid.
 - [ ] Kaalupiirangut ületavat sõidukit ei märgita sobivaks.
 - [ ] Kui veose pikkus või laius ületab platvormi vastavat mõõtu või mõõtude sobivust
   ei saa kindlalt hinnata, suunatakse juhtum käsitsi kontrolli
   (`NEEDS_MANUAL_REVIEW`).
+- [ ] Kui automaatselt sobivat aktiivset sõidukit ei leita, suunatakse päring käsitsi
+  ülevaatamisele (`NEEDS_MANUAL_REVIEW`), mitte ei lükata seda automaatselt tagasi.
+- [ ] Automaatvastus ei maini alltöövõtjaid ega luba alternatiivse lahenduse leidmist.
 - [ ] Süsteem ei arvuta ega kirjelda üleulatuse suurust ega järelda sellest eriloa või
   saateauto vajadust; need asjaolud tuleb käsitsi üle kontrollida.
 - [ ] Täpselt mõõdetud kraana tõstekaugusel kasutatakse vastava andmebaasirea
@@ -203,9 +212,10 @@ vestlusvastus `NEED_MORE_INFORMATION`, mitte serveri viga.
 - Kas uus kliendipäring jääb eraldi endpointiks `POST /api/vehicle-assessment` või
   soovitakse muuta olemasolevat `POST /api/ask`? Eraldi endpoint on soovituslik, sest
   praegune `/api/ask` genereerib SQL-i ning selle kasutajavoog on ADMIN-i andmepäring.
-- Kas endpoint peab olema avalik või nõuab autentimist/rate limit'it? Praegune
-  `/api/ask` ei kontrolli backendis ADMIN rolli; uue väliskliendi endpointi ligipääs
-  tuleb turvaliselt määratleda enne avalikku kasutust.
+- Endpoint ei nõua praegu autentimist; IP-aadressi kohta kehtib piirang 5 päringut
+  minutis ja 30 päringut tunnis. Piirang hoitakse rakenduse mälus, seega mitme
+  rakendusinstantsi või puhverserveri kasutamisel tuleb see viia jagatud lahendusse
+  ning usaldatud puhverserveri IP päised eraldi seadistada.
 - Kui veose pikkuse ja laiuse suunda võib platvormile sobitamisel pöörata, tuleb see
   käsitsi kontrollida; süsteem ei arvuta ega kirjelda üleulatuse suurust.
 - Kas klient sisestab küsimuse vabatekstina või peaks tulevikus kasutajaliides mõõdud
